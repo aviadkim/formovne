@@ -1,51 +1,10 @@
 import React, { useState } from 'react';
 import { FileText, Check, AlertCircle, PenTool } from 'lucide-react';
 
-interface DeclarationsProps {
-  onDataChange?: (data: any) => void;
-  onComplete?: (isComplete: boolean) => void;
-}
-
-interface Section {
-  title: string;
-  content: string;
-}
-
-const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onComplete }) => {
-  const [readSections, setReadSections] = useState<Record<number, boolean>>({});
+const DeclarationsAndSignature = () => {
+  const [readSections, setReadSections] = useState({});
+  const [signaturePad, setSignaturePad] = useState(null);
   const [finalConfirmation, setFinalConfirmation] = useState(false);
-  const [signaturePad, setSignaturePad] = useState<any>(null);
-
-  const sections: Section[] = [
-    {
-      title: 'מבוא ופרשנות',
-      content: 'תוכן המבוא...'
-    },
-    {
-      title: 'גילוי נאות',
-      content: 'תוכן הגילוי הנאות...'
-    },
-    {
-      title: 'הצהרת הלקוח',
-      content: 'תוכן הצהרת הלקוח...'
-    }
-  ];
-
-  const updateReadStatus = (index: number, isRead: boolean) => {
-    const newReadSections = { ...readSections, [index]: isRead };
-    setReadSections(newReadSections);
-    
-    const isComplete = Object.keys(newReadSections).length === sections.length && finalConfirmation;
-    onComplete?.(isComplete);
-    onDataChange?.({ readSections: newReadSections });
-  };
-
-  const handleFinalConfirmation = (checked: boolean) => {
-    setFinalConfirmation(checked);
-    const isComplete = Object.keys(readSections).length === sections.length && checked;
-    onComplete?.(isComplete);
-    onDataChange?.({ finalConfirmation: checked });
-  };
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
@@ -61,7 +20,20 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onComplete })
         <div className="space-y-8">
           {/* Declarations Accordion */}
           <div className="space-y-4">
-            {sections.map((section, index) => (
+            {[
+              {
+                title: 'מבוא ופרשנות',
+                content: 'תוכן המבוא...'
+              },
+              {
+                title: 'גילוי נאות',
+                content: 'תוכן הגילוי הנאות...'
+              },
+              {
+                title: 'הצהרת הלקוח',
+                content: 'תוכן הצהרת הלקוח...'
+              }
+            ].map((section, index) => (
               <div key={index} className="border-2 border-gray-200 rounded-xl overflow-hidden">
                 <div className="bg-gray-50 p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -74,12 +46,13 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onComplete })
                     )}
                   </div>
                   <button 
-                    onClick={() => updateReadStatus(index, true)}
+                    onClick={() => setReadSections(prev => ({...prev, [index]: true}))}
                     className="text-purple-600 hover:text-purple-700 font-medium"
                   >
                     קרא עוד
                   </button>
                 </div>
+                {/* Content will be expanded/collapsed */}
               </div>
             ))}
           </div>
@@ -98,9 +71,6 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onComplete })
               
               <p>ידוע לי כי במידה ולא אמסור פרט או פרטים מאלה המצוינים בשאלון זה יקשה על החברה 
               ליתן לי את השרות המבוקש במסגרת הסכם זה.</p>
-
-              <p>בנוסף, בחתימתי על מסמך זה אני מתחייב לעדכן אתכם בכתב לגבי כל שינוי בנתונים המיוחדים 
-              המפורטים בנספח זה בכל עת שיחול בהם שינוי ולפחות פעם בשנה.</p>
             </div>
 
             <label className="flex items-center gap-3 p-4 border-2 border-purple-200 rounded-lg
@@ -108,7 +78,7 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onComplete })
               <input 
                 type="checkbox"
                 checked={finalConfirmation}
-                onChange={(e) => handleFinalConfirmation(e.target.checked)}
+                onChange={(e) => setFinalConfirmation(e.target.checked)}
                 className="w-5 h-5 border-2 border-purple-300 rounded
                          checked:bg-purple-600 checked:border-purple-600
                          focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
@@ -127,6 +97,7 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onComplete })
             </div>
             
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-white">
+              {/* Here we'll integrate the signature pad component */}
               <div className="h-48 bg-gray-50 rounded-lg"></div>
             </div>
 
@@ -166,4 +137,4 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onComplete })
   );
 };
 
-export default Declarations;
+export default DeclarationsAndSignature;
