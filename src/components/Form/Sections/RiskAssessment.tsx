@@ -1,7 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Clock, PieChart, TrendingUp, LineChart, AlertCircle } from 'lucide-react';
 
-const RiskAssessment = () => {
+interface RiskAssessmentProps {
+  onDataChange?: (data: any) => void;
+}
+
+const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
+  const [selectedGoal, setSelectedGoal] = useState('');
+  const [selectedPeriod, setSelectedPeriod] = useState('');
+  const [selectedPercentage, setSelectedPercentage] = useState('');
+
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange({
+        mainGoal: selectedGoal,
+        investmentPeriod: selectedPeriod,
+        investmentPercentage: selectedPercentage
+      });
+    }
+  }, [selectedGoal, selectedPeriod, selectedPercentage, onDataChange]);
+
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
       <div className="p-8">
@@ -28,7 +46,14 @@ const RiskAssessment = () => {
                 'להגדיל את ההון'
               ].map((goal) => (
                 <label key={goal} className="relative">
-                  <input type="radio" name="mainGoal" className="peer sr-only" />
+                  <input 
+                    type="radio" 
+                    name="mainGoal" 
+                    className="peer sr-only"
+                    value={goal}
+                    checked={selectedGoal === goal}
+                    onChange={(e) => setSelectedGoal(e.target.value)}
+                  />
                   <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
                               peer-checked:border-orange-600 peer-checked:bg-orange-50
                               hover:border-orange-200 transition-all duration-300">
@@ -53,7 +78,14 @@ const RiskAssessment = () => {
                 'לא מוגבל בזמן'
               ].map((period) => (
                 <label key={period} className="relative">
-                  <input type="radio" name="investmentPeriod" className="peer sr-only" />
+                  <input 
+                    type="radio" 
+                    name="investmentPeriod" 
+                    className="peer sr-only"
+                    value={period}
+                    checked={selectedPeriod === period}
+                    onChange={(e) => setSelectedPeriod(e.target.value)}
+                  />
                   <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
                               peer-checked:border-blue-600 peer-checked:bg-blue-50
                               hover:border-blue-200 transition-all duration-300">
@@ -78,7 +110,14 @@ const RiskAssessment = () => {
                 'מעל 50%'
               ].map((percentage) => (
                 <label key={percentage} className="relative">
-                  <input type="radio" name="investmentPercentage" className="peer sr-only" />
+                  <input 
+                    type="radio" 
+                    name="investmentPercentage" 
+                    className="peer sr-only"
+                    value={percentage}
+                    checked={selectedPercentage === percentage}
+                    onChange={(e) => setSelectedPercentage(e.target.value)}
+                  />
                   <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
                               peer-checked:border-green-600 peer-checked:bg-green-50
                               hover:border-green-200 transition-all duration-300">
