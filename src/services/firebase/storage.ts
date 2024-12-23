@@ -1,11 +1,11 @@
-import { getFirestore, addDoc, collection, doc, updateDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './config';
 import { FormData } from '../../types/form';
 
 // Save initial personal details
 export const savePersonalDetailsToFirebase = async (personalData: any) => {
   try {
-    const db = getFirestore();
     const docRef = await addDoc(collection(db, 'personalDetails'), {
       ...personalData,
       timestamp: new Date(),
@@ -23,7 +23,6 @@ export const savePersonalDetailsToFirebase = async (personalData: any) => {
 // Save complete form
 export const saveFormToFirebase = async (formData: FormData) => {
   try {
-    const db = getFirestore();
     const docRef = await addDoc(collection(db, 'forms'), {
       ...formData,
       timestamp: new Date(),
@@ -42,13 +41,11 @@ export const saveFormToFirebase = async (formData: FormData) => {
 export const savePDFToFirebase = async (pdfBlob: Blob, formId: string): Promise<string> => {
   try {
     // Upload PDF to Storage
-    const storage = getStorage();
     const pdfRef = ref(storage, `forms/${formId}/form.pdf`);
     await uploadBytes(pdfRef, pdfBlob);
     const downloadUrl = await getDownloadURL(pdfRef);
 
     // Update form document with PDF URL
-    const db = getFirestore();
     const formRef = doc(db, 'forms', formId);
     await updateDoc(formRef, {
       pdfUrl: downloadUrl,
