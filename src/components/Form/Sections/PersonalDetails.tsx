@@ -34,11 +34,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             </div>
             <h2 className="text-2xl font-bold text-gray-800">פרטים אישיים</h2>
           </div>
-          <img 
-            src="/api/placeholder/120/40" 
-            alt="Movne Logo" 
-            className="h-12"
-          />
         </div>
 
         <div className="space-y-8">

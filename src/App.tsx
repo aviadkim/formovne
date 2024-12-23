@@ -24,11 +24,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      {/* הוספת הלוגו כאן */}
+      {/* לוגו ראשי */}
       <div className="max-w-4xl mx-auto mb-8 text-center">
-        <img src="/movne-logo.png" alt="Movne Logo" className="h-16 mx-auto" />
+        <img src="/movne-logo.png" alt="Movne Logo" className="h-14 mx-auto" />
       </div>
-
+  
       <div className="max-w-4xl mx-auto space-y-8">
         <PersonalDetails
           onDataChange={(data) => setFormData(prev => ({ ...prev, personal: data }))}

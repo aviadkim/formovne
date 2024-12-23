@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Clock, PieChart, TrendingUp, LineChart, AlertCircle } from 'lucide-react';
+import { Target, Clock, PieChart, TrendingUp } from 'lucide-react';
 
 interface RiskAssessmentProps {
   onDataChange?: (data: any) => void;
