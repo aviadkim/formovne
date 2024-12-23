@@ -2,9 +2,10 @@ import React from 'react';
 
 interface ThankYouProps {
   formId?: string;
+  downloadUrl?: string;
 }
 
-const ThankYou: React.FC<ThankYouProps> = ({ formId }) => {
+const ThankYou: React.FC<ThankYouProps> = ({ formId, downloadUrl }) => {
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 text-center" dir="rtl">
       <div className="mb-6">
@@ -18,6 +19,18 @@ const ThankYou: React.FC<ThankYouProps> = ({ formId }) => {
       <p className="text-gray-600 mb-4">פנייתך התקבלה במערכת בהצלחה</p>
       {formId && (
         <p className="text-sm text-gray-500">מספר פנייה: {formId}</p>
+      )}
+      {downloadUrl && (
+        <div className="mt-4">
+          <a 
+            href={downloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            להורדת הטופס המלא
+          </a>
+        </div>
       )}
       <div className="mt-8">
         <p className="text-gray-700">נציג מובנה גלובל יצור עמך קשר בהקדם</p>

@@ -73,9 +73,9 @@ function App() {
       )}
 
       {isSubmitted ? (
-        <ThankYou 
-          formId={submittedFormId || undefined} 
-          pdfUrl={pdfUrl || undefined}
+        <ThankYou
+          formId={submittedFormId || undefined}
+          downloadUrl={pdfUrl || undefined}
         />
       ) : (
         <div className="max-w-4xl mx-auto space-y-8">
