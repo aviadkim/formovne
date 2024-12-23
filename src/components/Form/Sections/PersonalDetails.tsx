@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, Home, Calendar, UserCheck, Building } from 'lucide-react';
+import { savePersonalDetailsToFirebase } from '../../../services/firebase/storage';
+import { User, Briefcase, Mail, Phone, MapPin, Calendar } from 'lucide-react';
 
 interface PersonalDetailsProps {
   onDataChange?: (data: any) => void;
@@ -17,174 +18,177 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
     company: ''
   });
 
-  const handleChange = (field: string, value: string) => {
-    const newData = { ...formData, [field]: value };
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const newData = { ...formData, [name]: value };
     setFormData(newData);
-    onDataChange?.(newData);
+    
+    if (onDataChange) {
+      onDataChange(newData);
+    }
+
+    // Auto-save when all required fields are filled
+    if (isFormComplete(newData)) {
+      try {
+        await savePersonalDetailsToFirebase(newData);
+        console.log('Personal details saved automatically');
+      } catch (error) {
+        console.error('Error saving personal details:', error);
+      }
+    }
+  };
+
+  const isFormComplete = (data: any) => {
+    return data.firstName && 
+           data.lastName && 
+           data.email && 
+           data.phone;
   };
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
       <div className="p-8">
-        {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <User className="w-6 h-6 text-blue-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800">פרטים אישיים</h2>
+        {/* Section Header */}
+        <div className="flex items-center space-x-4 mb-8">
+          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+            <User className="w-6 h-6 text-blue-600" />
           </div>
+          <h2 className="text-2xl font-bold text-gray-800">פרטים אישיים</h2>
         </div>
 
-        <div className="space-y-8">
-          {/* Basic Details */}
-          <div className="p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <UserCheck className="w-4 h-4" />
-                  שם פרטי
-                </label>
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => handleChange('firstName', e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg
-                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                           transition-all duration-300"
-                  placeholder="הכנס שם פרטי"
-                />
-              </div>
-              
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <UserCheck className="w-4 h-4" />
-                  שם משפחה
-                </label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => handleChange('lastName', e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg
-                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                           transition-all duration-300"
-                  placeholder="הכנס שם משפחה"
-                />
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Full Name */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                שם פרטי
+              </label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                שם משפחה
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
             </div>
           </div>
 
-          {/* Contact Details */}
-          <div className="p-6 bg-gradient-to-br from-gray-50 to-green-50 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+          {/* Contact Info */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  דואר אלקטרוני
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg
-                           focus:ring-2 focus:ring-green-500 focus:border-green-500
-                           transition-all duration-300"
-                  placeholder="הכנס כתובת מייל"
-                  dir="ltr"
-                />
-              </div>
-              
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                  <span>דוא"ל</span>
+                </div>
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4" />
-                  טלפון נייד
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleChange('phone', e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg
-                           focus:ring-2 focus:ring-green-500 focus:border-green-500
-                           transition-all duration-300"
-                  placeholder="הכנס מספר טלפון"
-                  dir="ltr"
-                />
-              </div>
+                  <span>טלפון</span>
+                </div>
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
             </div>
           </div>
 
-          {/* Additional Details */}
-          <div className="p-6 bg-gradient-to-br from-gray-50 to-purple-50 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <Home className="w-4 h-4" />
-                  כתובת מגורים
-                </label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => handleChange('address', e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg
-                           focus:ring-2 focus:ring-purple-500 focus:border-purple-500
-                           transition-all duration-300"
-                  placeholder="הכנס כתובת מלאה"
-                />
+          {/* Address */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                <span>כתובת</span>
               </div>
-              
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <Calendar className="w-4 h-4" />
-                  תאריך לידה
-                </label>
-                <input
-                  type="date"
-                  value={formData.birthDate}
-                  onChange={(e) => handleChange('birthDate', e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg
-                           focus:ring-2 focus:ring-purple-500 focus:border-purple-500
-                           transition-all duration-300"
-                  dir="ltr"
-                />
-              </div>
-            </div>
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
 
-          {/* Employment Details */}
-          <div className="p-6 bg-gradient-to-br from-gray-50 to-orange-50 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <UserCheck className="w-4 h-4" />
-                  עיסוק / מקצוע
-                </label>
-                <input
-                  type="text"
-                  value={formData.occupation}
-                  onChange={(e) => handleChange('occupation', e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg
-                           focus:ring-2 focus:ring-orange-500 focus:border-orange-500
-                           transition-all duration-300"
-                  placeholder="הכנס עיסוק"
-                />
+          {/* Birth Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>תאריך לידה</span>
               </div>
-              
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <Building className="w-4 h-4" />
-                  מקום עבודה
-                </label>
-                <input
-                  type="text"
-                  value={formData.company}
-                  onChange={(e) => handleChange('company', e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg
-                           focus:ring-2 focus:ring-orange-500 focus:border-orange-500
-                           transition-all duration-300"
-                  placeholder="הכנס מקום עבודה"
-                />
+            </label>
+            <input
+              type="date"
+              name="birthDate"
+              value={formData.birthDate}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Occupation */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4" />
+                <span>תעסוקה</span>
               </div>
-            </div>
+            </label>
+            <input
+              type="text"
+              name="occupation"
+              value={formData.occupation}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Company */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4" />
+                <span>חברה</span>
+              </div>
+            </label>
+            <input
+              type="text"
+              name="company"
+              value={formData.company}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
         </div>
       </div>

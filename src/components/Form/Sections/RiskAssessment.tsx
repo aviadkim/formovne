@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Target, Clock, PieChart, TrendingUp } from 'lucide-react';
 
 interface RiskAssessmentProps {
@@ -6,19 +6,24 @@ interface RiskAssessmentProps {
 }
 
 const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
-  const [selectedGoal, setSelectedGoal] = useState('');
-  const [selectedPeriod, setSelectedPeriod] = useState('');
-  const [selectedPercentage, setSelectedPercentage] = useState('');
+  const [formState, setFormState] = useState({
+    mainGoal: '',
+    investmentPeriod: '',
+    investmentPercentage: ''
+  });
 
-  useEffect(() => {
-    if (onDataChange && (selectedGoal || selectedPeriod || selectedPercentage)) {
-      onDataChange({
-        mainGoal: selectedGoal,
-        investmentPeriod: selectedPeriod,
-        investmentPercentage: selectedPercentage
-      });
-    }
-  }, [selectedGoal, selectedPeriod, selectedPercentage, onDataChange]);
+  const handleChange = useCallback((field: string, value: string) => {
+    setFormState(prev => {
+      const newState = {
+        ...prev,
+        [field]: value
+      };
+      if (onDataChange) {
+        onDataChange(newState);
+      }
+      return newState;
+    });
+  }, [onDataChange]);
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
@@ -51,8 +56,8 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
                     name="mainGoal" 
                     className="peer sr-only"
                     value={goal}
-                    checked={selectedGoal === goal}
-                    onChange={(e) => setSelectedGoal(e.target.value)}
+                    checked={formState.mainGoal === goal}
+                    onChange={(e) => handleChange('mainGoal', e.target.value)}
                   />
                   <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
                               peer-checked:border-orange-600 peer-checked:bg-orange-50
@@ -83,8 +88,8 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
                     name="investmentPeriod" 
                     className="peer sr-only"
                     value={period}
-                    checked={selectedPeriod === period}
-                    onChange={(e) => setSelectedPeriod(e.target.value)}
+                    checked={formState.investmentPeriod === period}
+                    onChange={(e) => handleChange('investmentPeriod', e.target.value)}
                   />
                   <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
                               peer-checked:border-blue-600 peer-checked:bg-blue-50
@@ -115,8 +120,8 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
                     name="investmentPercentage" 
                     className="peer sr-only"
                     value={percentage}
-                    checked={selectedPercentage === percentage}
-                    onChange={(e) => setSelectedPercentage(e.target.value)}
+                    checked={formState.investmentPercentage === percentage}
+                    onChange={(e) => handleChange('investmentPercentage', e.target.value)}
                   />
                   <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
                               peer-checked:border-green-600 peer-checked:bg-green-50
