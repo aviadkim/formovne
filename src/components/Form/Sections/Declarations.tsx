@@ -1,10 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FileText, Check, AlertCircle, PenTool } from 'lucide-react';
+import SignaturePad from '../../Common/SignaturePad';
 
-const DeclarationsAndSignature = () => {
-  const [readSections, setReadSections] = useState({});
-  const [signaturePad, setSignaturePad] = useState(null);
+interface DeclarationsProps {
+  onDataChange?: (data: any) => void;
+  onSubmit?: () => Promise<void>;
+}
+
+const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) => {
+  const [readSections, setReadSections] = useState<Record<number, boolean>>({});
   const [finalConfirmation, setFinalConfirmation] = useState(false);
+  const signatureRef = useRef(null);
+
+  const declarations = [
+    {
+      title: 'מבוא ופרשנות',
+      content: `הסכם זה נחתם בין חברת מובנה ("החברה") לבין הלקוח. 
+      ההסכם מגדיר את תנאי ההתקשרות בין הצדדים לצורך קבלת שירותי שיווק השקעות.
+      כל המונחים בהסכם זה יפורשו בהתאם להגדרתם בחוק הסדרת העיסוק בייעוץ השקעות, 
+      בשיווק השקעות ובניהול תיקי השקעות, התשנ"ה-1995.`
+    },
+    {
+      title: 'גילוי נאות',
+      content: `החברה מצהירה כי היא בעלת רישיון לשיווק השקעות מאת רשות ניירות ערך.
+      החברה עוסקת בשיווק השקעות ולא בייעוץ השקעות, ועשויה להעדיף נכסים פיננסיים 
+      שלגופים המוסדיים המנפיקים אותם יש זיקה אליהם. הלקוח מאשר כי הובהר לו שהחברה 
+      משווקת השקעות ולא מייעצת.`
+    },
+    {
+      title: 'הצהרת הלקוח',
+      content: `אני מצהיר כי כל הפרטים שמסרתי בטופס זה הם נכונים, מדויקים ומלאים.
+      אני מתחייב להודיע לחברה על כל שינוי בפרטים אלו. אני מאשר כי קראתי את כל 
+      תנאי ההסכם, הבנתי אותם, ואני מסכים להם.`
+    }
+  ];
+
+  const handleSaveSignature = (signatureData: string) => {
+    onDataChange?.({ signature: signatureData });
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
@@ -20,20 +53,7 @@ const DeclarationsAndSignature = () => {
         <div className="space-y-8">
           {/* Declarations Accordion */}
           <div className="space-y-4">
-            {[
-              {
-                title: 'מבוא ופרשנות',
-                content: 'תוכן המבוא...'
-              },
-              {
-                title: 'גילוי נאות',
-                content: 'תוכן הגילוי הנאות...'
-              },
-              {
-                title: 'הצהרת הלקוח',
-                content: 'תוכן הצהרת הלקוח...'
-              }
-            ].map((section, index) => (
+            {declarations.map((section, index) => (
               <div key={index} className="border-2 border-gray-200 rounded-xl overflow-hidden">
                 <div className="bg-gray-50 p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -46,13 +66,21 @@ const DeclarationsAndSignature = () => {
                     )}
                   </div>
                   <button 
-                    onClick={() => setReadSections(prev => ({...prev, [index]: true}))}
+                    onClick={() => {
+                      const newSections = { ...readSections, [index]: true };
+                      setReadSections(newSections);
+                      onDataChange?.(newSections);
+                    }}
                     className="text-purple-600 hover:text-purple-700 font-medium"
                   >
                     קרא עוד
                   </button>
                 </div>
-                {/* Content will be expanded/collapsed */}
+                <div className={`max-h-0 overflow-hidden transition-all duration-300 ${readSections[index] ? 'max-h-96 p-4' : ''}`}>
+                  <div className="prose prose-sm text-gray-600">
+                    {section.content}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -78,7 +106,10 @@ const DeclarationsAndSignature = () => {
               <input 
                 type="checkbox"
                 checked={finalConfirmation}
-                onChange={(e) => setFinalConfirmation(e.target.checked)}
+                onChange={(e) => {
+                  setFinalConfirmation(e.target.checked);
+                  onDataChange?.({ finalConfirmation: e.target.checked });
+                }}
                 className="w-5 h-5 border-2 border-purple-300 rounded
                          checked:bg-purple-600 checked:border-purple-600
                          focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
@@ -90,27 +121,10 @@ const DeclarationsAndSignature = () => {
           </div>
 
           {/* Digital Signature */}
-          <div className="p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <PenTool className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-semibold text-gray-800">חתימה דיגיטלית</h3>
-            </div>
-            
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-white">
-              {/* Here we'll integrate the signature pad component */}
-              <div className="h-48 bg-gray-50 rounded-lg"></div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-4">
-              <button className="px-4 py-2 text-gray-600 hover:text-gray-700 font-medium">
-                נקה חתימה
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
-                             font-medium transition-colors duration-200">
-                שמור חתימה
-              </button>
-            </div>
-          </div>
+          <SignaturePad 
+            onSave={handleSaveSignature}
+            signatureRef={signatureRef}
+          />
         </div>
       </div>
 
@@ -123,6 +137,7 @@ const DeclarationsAndSignature = () => {
           </div>
         </div>
         <button
+          onClick={onSubmit}
           disabled={!finalConfirmation || Object.keys(readSections).length < 3}
           className={`px-8 py-4 rounded-full shadow-lg text-white font-medium
             ${finalConfirmation && Object.keys(readSections).length === 3 
@@ -137,4 +152,4 @@ const DeclarationsAndSignature = () => {
   );
 };
 
-export default DeclarationsAndSignature;
+export default Declarations;
