@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { FileText, Check, AlertCircle, PenTool } from 'lucide-react';
-import SignaturePad from '../../Common/SignaturePad';
+import { FileText, Check, AlertCircle } from 'lucide-react';
+import SignaturePad from '../Common/SignaturePad';
 
 interface DeclarationsProps {
   onDataChange?: (data: any) => void;
