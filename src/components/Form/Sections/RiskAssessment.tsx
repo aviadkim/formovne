@@ -11,7 +11,7 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
   const [selectedPercentage, setSelectedPercentage] = useState('');
 
   useEffect(() => {
-    if (onDataChange) {
+    if (onDataChange && (selectedGoal || selectedPeriod || selectedPercentage)) {
       onDataChange({
         mainGoal: selectedGoal,
         investmentPeriod: selectedPeriod,
