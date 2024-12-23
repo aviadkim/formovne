@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Target, Clock, PieChart, TrendingUp } from 'lucide-react';
 
 interface RiskAssessmentProps {
@@ -12,19 +12,21 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
     investmentPercentage: ''
   });
 
-  const handleChange = useCallback((field: string, value: string) => {
-    setFormState(prev => {
-      const newState = {
-        ...prev,
-        [field]: value
-      };
-      if (onDataChange) {
-        onDataChange(newState);
-      }
-      return newState;
-    });
-  }, [onDataChange]);
+  // Use useEffect to notify parent of changes instead of doing it during render
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange(formState);
+    }
+  }, [formState, onDataChange]);
 
+  const handleChange = (field: string, value: string) => {
+    setFormState(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Rest of your component remains the same...
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
       <div className="p-8">
