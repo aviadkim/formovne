@@ -23,12 +23,12 @@ const ThankYou: React.FC<ThankYouProps> = ({ formId, downloadUrl }) => {
       {downloadUrl && (
         <div className="mt-4">
           <a 
-            href={downloadUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={downloadUrl} 
+            target="_blank" 
+            rel="noopener noreferrer" 
             className="text-blue-600 hover:text-blue-800 underline"
           >
-            להורדת הטופס המלא
+            צפה בטופס המלא
           </a>
         </div>
       )}
