@@ -1,8 +1,9 @@
 import { jsPDF } from 'jspdf';
 import { FormData } from '../../types/form';
 
-export async function generatePDF(formData: FormData): Promise<Blob> {
-  // Create new document
+export async function generatePDF(formData: FormData): Promise<{ pdfBlob: Blob; pngImages: string[] }> {
+  const pngImages: string[] = [];
+  
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -42,7 +43,6 @@ export async function generatePDF(formData: FormData): Promise<Blob> {
       doc.text(`סכום השקעה: ${investmentAmount?.toLocaleString() || ''} ₪`, 190, 140, { align: 'right' });
       doc.text(`בנק נבחר: ${selectedBank || ''}`, 190, 150, { align: 'right' });
       
-      // Currencies
       if (currencies) {
         const selectedCurrencies = Object.entries(currencies)
           .filter(([_, selected]) => selected)
@@ -51,7 +51,6 @@ export async function generatePDF(formData: FormData): Promise<Blob> {
         doc.text(`מטבעות: ${selectedCurrencies}`, 190, 160, { align: 'right' });
       }
 
-      // Investment Purposes
       if (purposes) {
         const selectedPurposes = Object.entries(purposes)
           .filter(([_, selected]) => selected)
@@ -82,9 +81,49 @@ export async function generatePDF(formData: FormData): Promise<Blob> {
     const currentDate = new Date().toLocaleDateString('he-IL');
     doc.text(`תאריך: ${currentDate}`, 190, 260, { align: 'right' });
 
-    return doc.output('blob');
+    // Capture pages as PNG
+    const formContainer = document.getElementById('form-container');
+    if (!formContainer) {
+      throw new Error('Form container not found');
+    }
+
+    const canvas = await window.html2canvas(formContainer, {
+      scale: 2,
+      useCORS: true,
+      logging: false
+    });
+    pngImages.push(canvas.toDataURL('image/png'));
+
+    return {
+      pdfBlob: doc.output('blob'),
+      pngImages
+    };
+
   } catch (error) {
     console.error('Error generating PDF:', error);
     throw error;
   }
+}
+
+export async function savePagesToFirebase(formId: string, images: string[]): Promise<string[]> {
+  const uploadPromises = images.map(async (imageData, index) => {
+    try {
+      // Convert data URL to Uint8Array
+      const response = await fetch(imageData);
+      const blob = await response.blob();
+      const arrayBuffer = await blob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      
+      // Save to Firebase
+      const path = `forms/${formId}/page${index + 1}.png`;
+      await window.fs.writeFile(path, uint8Array);
+      
+      return path;
+    } catch (error) {
+      console.error(`Error saving page ${index + 1}:`, error);
+      throw error;
+    }
+  });
+
+  return Promise.all(uploadPromises);
 }
