@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Target, Clock, PieChart, TrendingUp } from 'lucide-react';
 
 interface RiskAssessmentProps {
@@ -12,21 +12,19 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
     investmentPercentage: ''
   });
 
-  // Use useEffect to notify parent of changes instead of doing it during render
-  useEffect(() => {
-    if (onDataChange) {
-      onDataChange(formState);
-    }
-  }, [formState, onDataChange]);
-
+  // Prevent infinite loop by handling changes directly
   const handleChange = (field: string, value: string) => {
-    setFormState(prev => ({
-      ...prev,
+    const newState = {
+      ...formState,
       [field]: value
-    }));
+    };
+    setFormState(newState);
+    // Notify parent component only when data actually changes
+    if (onDataChange) {
+      onDataChange(newState);
+    }
   };
 
-  // Rest of your component remains the same...
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
       <div className="p-8">
