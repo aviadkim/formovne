@@ -1,102 +1,85 @@
 import React, { useState } from 'react';
-import { generatePDF, savePagesToFirebase } from '../services/pdf/generator';
+import PersonalDetails from './Form/Sections/PersonalDetails';
+import InvestmentDetails from './Form/Sections/InvestmentDetails';
+import RiskAssessment from './Form/Sections/RiskAssessment';
 import { FormData } from '../types/form';
+import { generatePDF } from '../services/pdf/generator';
 
 const PDFTest: React.FC = () => {
   const [status, setStatus] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [formData, setFormData] = useState<FormData>({
+    personal: {},
+    investment: {},
+    risk: {},
+    declarations: {}
+  });
+
+  const handleDataChange = (section: keyof FormData, data: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: data
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (isSubmitting) return;
     
     setIsSubmitting(true);
-    setStatus('מתחיל יצירת הטופס...');
+    setStatus('מתחיל תהליך שמירה...');
 
     try {
-      const formData: FormData = {
-        personal: {
-          firstName: 'ישראל',
-          lastName: 'ישראלי',
-          phone: '050-1234567',
-          email: 'test@test.com',
-          address: 'רחוב הרצל 1',
-          birthDate: '1990-01-01',
-          occupation: 'עצמאי',
-          company: 'חברה בע"מ'
-        },
-        investment: {
-          investmentAmount: 100000,
-          selectedBank: 'לאומי',
-          currencies: { USD: true, EUR: true },
-          purposes: { savings: true }
-        },
-        risk: {
-          mainGoal: 'חיסכון לטווח ארוך',
-          investmentPeriod: '5-10 שנים',
-          investmentPercentage: '20%'
-        },
-        declarations: {
-          readSections: { 1: true, 2: true, 3: true },
-          finalConfirmation: true
-        }
-      };
-
-      setStatus('יוצר PDF ותמונות...');
       const { pdfBlob, pngImages } = await generatePDF(formData);
-
-      // שמירה בפיירבייס
-      setStatus('שומר בפיירבייס...');
-      const formId = Date.now().toString();
-      const savedPaths = await savePagesToFirebase(formId, pngImages);
+      setStatus('PDF נוצר בהצלחה!');
 
       // יצירת קישור להורדת PDF
       const pdfUrl = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = pdfUrl;
-      a.download = `form-${formId}.pdf`;
+      a.download = `form-${Date.now()}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(pdfUrl);
 
-      setStatus('הטופס נשלח בהצלחה!');
-      
+      // תצוגה מקדימה של התמונה
+      if (pngImages.length > 0) {
+        const imageUrl = URL.createObjectURL(new Blob([pngImages[0]], { type: 'image/png' }));
+        console.log('Preview URL:', imageUrl);
+      }
+
     } catch (error) {
       console.error('Error:', error);
-      setStatus(`שגיאה: ${error instanceof Error ? error.message : 'אירעה שגיאה'}`);
+      setStatus('אירעה שגיאה בשמירת הטופס');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">שליחת טופס</h2>
-        
-        {/* חשוב: הוספת id="form-container" לאלמנט שמכיל את הטופס */}
-        <form id="form-container" onSubmit={handleSubmit}>
-          <div className="form-page">
-            {/* תוכן הטופס שלך */}
-          </div>
+    <div className="max-w-4xl mx-auto p-6">
+      <form id="form-container" onSubmit={handleSubmit}>
+        <div className="space-y-6">
+          <PersonalDetails onDataChange={(data) => handleDataChange('personal', data)} />
+          <InvestmentDetails onDataChange={(data) => handleDataChange('investment', data)} />
+          <RiskAssessment onDataChange={(data) => handleDataChange('risk', data)} />
           
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 disabled:opacity-50"
           >
-            {isSubmitting ? 'שולח...' : 'שלח טופס'}
+            {isSubmitting ? 'שומר...' : 'שלח טופס'}
           </button>
-        </form>
 
-        {status && (
-          <div className="mt-4 p-3 bg-gray-50 rounded border text-sm">
-            {status}
-          </div>
-        )}
-      </div>
+          {status && (
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg border text-center">
+              {status}
+            </div>
+          )}
+        </div>
+      </form>
     </div>
   );
 };

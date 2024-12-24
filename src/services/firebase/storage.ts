@@ -1,30 +1,17 @@
-import { PersonalData } from '../../types/form';
+// src/services/firebase/storage.ts
 
-export const savePersonalDetailsToFirebase = async (data: PersonalData): Promise<string> => {
+export async function saveTempImage(imageData: string): Promise<string> {
   try {
-    // יצירת מזהה ייחודי לפי תאריך
-    const timestamp = Date.now();
-    const fileName = `personal_details_${timestamp}.json`;
-
-    // המרה ל-JSON
-    const jsonData = JSON.stringify(data);
-
-    // שמירה באמצעות ה-fs API
-    await window.fs.writeFile(fileName, jsonData);
-
-    // החזרת המזהה הייחודי
-    return fileName;
+    const filename = `temp_${Date.now()}.png`;
+    const blob = await (await fetch(imageData)).blob();
+    return URL.createObjectURL(blob);
   } catch (error) {
-    console.error('שגיאה בשמירת פרטים אישיים:', error);
+    console.error('Error saving temp image:', error);
     throw error;
   }
-};
+}
 
-declare global {
-  interface Window {
-    fs: {
-      readFile: (path: string, options?: { encoding?: string }) => Promise<Uint8Array | string>;
-      writeFile: (path: string, data: Uint8Array | string) => Promise<void>;
-    }
-  }
+export async function savePersonalDetailsToFirebase(data: any): Promise<void> {
+  // יישום בהמשך אם יהיה צורך
+  console.log('Saving personal details:', data);
 }
