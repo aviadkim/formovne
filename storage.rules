@@ -1,8 +1,12 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if true;  // בסביבת פיתוח מאפשרים הכל
+    match /forms/{year}/{month}/{day}/{formId}.pdf {
+      // מאפשר קריאה לכל אחד (כדי שיוכלו להוריד את הPDF)
+      allow read: if true;
+      // מאפשר כתיבה רק מהדומיינים המורשים
+      allow write: if request.origin.matches('http://localhost:.*') ||
+                    request.origin.matches('https://client-d5bfe.web.app');
     }
   }
 }
