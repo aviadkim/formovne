@@ -3,8 +3,8 @@ import { FileText, Check, AlertCircle } from 'lucide-react';
 import SignaturePad from '../Common/SignaturePad';
 
 interface DeclarationsProps {
-  onDataChange?: (data: any) => void;
-  onSubmit?: () => Promise<void>;
+  onDataChange?: (data: Record<string, unknown>) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
 }
 
 const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) => {
@@ -39,6 +39,11 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
     onDataChange?.({ signature: signatureData });
   };
 
+  const handleSubmitClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const formEvent = new Event('submit', { bubbles: true, cancelable: true });
+    e.currentTarget.form?.dispatchEvent(formEvent);
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
       <div className="p-8">
@@ -66,10 +71,11 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
                     )}
                   </div>
                   <button 
+                    type="button"
                     onClick={() => {
                       const newSections = { ...readSections, [index]: true };
                       setReadSections(newSections);
-                      onDataChange?.(newSections);
+                      onDataChange?.({ readSections: newSections });
                     }}
                     className="text-purple-600 hover:text-purple-700 font-medium"
                   >
@@ -93,16 +99,18 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
             </div>
             
             <div className="prose prose-sm max-w-none text-gray-600 mb-4 leading-relaxed">
-              <p>בחתימתי על מסמך זה הריני להצהיר, כל מידע אשר נתבקשתי למסור אולם נמנעתי מלמסרו, 
-              הינו מידע אשר אין ברצוני שישמש את החברה במסגרת מילוי תפקידם על-פי הסכם זה ואני מוותר בזאת על כל טענה 
-              ו/או טרוניה ו/או זכות כלשהי בדבר שיווק השקעות ללא שימוש במידע זה.</p>
-              
-              <p>ידוע לי כי במידה ולא אמסור פרט או פרטים מאלה המצוינים בשאלון זה יקשה על החברה 
-              ליתן לי את השרות המבוקש במסגרת הסכם זה.</p>
+              <p>
+                בחתימתי על מסמך זה הריני להצהיר, כל מידע אשר נתבקשתי למסור אולם נמנעתי מלמסרו, 
+                הינו מידע אשר אין ברצוני שישמש את החברה במסגרת מילוי תפקידם על-פי הסכם זה ואני מוותר בזאת על כל טענה 
+                ו/או טרוניה ו/או זכות כלשהי בדבר שיווק השקעות ללא שימוש במידע זה.
+              </p>
+              <p>
+                ידוע לי כי במידה ולא אמסור פרט או פרטים מאלה המצוינים בשאלון זה יקשה על החברה 
+                ליתן לי את השרות המבוקש במסגרת הסכם זה.
+              </p>
             </div>
 
-            <label className="flex items-center gap-3 p-4 border-2 border-purple-200 rounded-lg
-                           bg-purple-50 cursor-pointer">
+            <label className="flex items-center gap-3 p-4 border-2 border-purple-200 rounded-lg bg-purple-50 cursor-pointer">
               <input 
                 type="checkbox"
                 checked={finalConfirmation}
@@ -128,7 +136,7 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
         </div>
       </div>
 
-      {/* Final Submit Button - Fixed at Bottom */}
+      {/* Submit Button */}
       <div className="fixed bottom-8 left-8 flex flex-col items-end gap-4">
         <div className="bg-white rounded-2xl shadow-lg p-4 text-center">
           <div className="text-sm font-medium text-gray-600 mb-1">סטטוס הטופס</div>
@@ -137,7 +145,8 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
           </div>
         </div>
         <button
-          onClick={onSubmit}
+          type="submit"
+          onClick={handleSubmitClick}
           disabled={!finalConfirmation || Object.keys(readSections).length < 3}
           className={`px-8 py-4 rounded-full shadow-lg text-white font-medium
             ${finalConfirmation && Object.keys(readSections).length === 3 
