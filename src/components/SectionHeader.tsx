@@ -27,9 +27,9 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon: Icon, title, color 
         <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
       </div>
       <img 
-        src="./movne-logo.png"
+        src="/movne-logo.png"
         alt="מובנה"
-        className="h-10 w-auto object-contain"
+        className="h-8 md:h-12 w-auto object-contain m-4"
       />
     </div>
   );
