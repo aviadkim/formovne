@@ -1,5 +1,6 @@
 import React from 'react';
 import { Briefcase, CreditCard, Building2, ArrowUpRight, Target } from 'lucide-react';
+import SectionHeader from '../../SectionHeader';
 
 interface InvestmentDetailsProps {
   onDataChange?: (data: any) => void;
@@ -7,17 +8,9 @@ interface InvestmentDetailsProps {
 
 const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
       <div className="p-8">
-        {/* Logo and Section Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-indigo-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800">שאלון השקעות</h2>
-          </div>
-        </div>
+        <SectionHeader icon={Briefcase} title="שאלון השקעות" color="indigo" />
 
         <div className="space-y-8">
           {/* Investment Amount */}
@@ -30,14 +23,11 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) =
               <input
                 type="number"
                 min="100000"
-                className="w-full p-4 text-right border-2 border-gray-200 rounded-lg
-                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                         transition-all duration-300"
+                className="w-full p-4 text-right border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
                 placeholder="הכנס סכום (מינימום ₪100,000)"
                 onChange={(e) => onDataChange?.({ investmentAmount: e.target.value })}
               />
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2
-                            text-sm font-medium text-gray-500">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-500">
                 ₪
               </div>
             </div>
@@ -61,9 +51,7 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) =
                     className="peer sr-only" 
                     onChange={() => onDataChange?.({ selectedBank: bank })}
                   />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
-                              peer-checked:border-green-600 peer-checked:bg-green-50
-                              hover:border-green-200 transition-all duration-300">
+                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-green-600 peer-checked:bg-green-50 hover:border-green-200 transition-all duration-300">
                     <span className="block text-center font-medium">{bank}</span>
                   </div>
                 </label>
@@ -88,9 +76,7 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) =
                       currencies: { [currency]: e.target.checked } 
                     })}
                   />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
-                              peer-checked:border-yellow-600 peer-checked:bg-yellow-50
-                              hover:border-yellow-200 transition-all duration-300">
+                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-yellow-600 peer-checked:bg-yellow-50 hover:border-yellow-200 transition-all duration-300">
                     <span className="block text-center font-medium">{currency}</span>
                   </div>
                 </label>
@@ -122,12 +108,7 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) =
                       purposes: { [purpose]: e.target.checked }
                     })}
                   />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
-                              peer-checked:border-purple-600 peer-checked:bg-purple-50
-                              hover:border-purple-200 transition-all duration-300
-                              flex items-center justify-start gap-3">
-                    <div className="w-5 h-5 border-2 border-gray-300 rounded
-                                peer-checked:bg-purple-600 peer-checked:border-purple-600" />
+                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-purple-600 peer-checked:bg-purple-50 hover:border-purple-200 transition-all duration-300 flex items-center gap-3">
                     <span className="font-medium">{purpose}</span>
                   </div>
                 </label>
@@ -136,16 +117,12 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) =
               <div className="md:col-span-2">
                 <label className="relative">
                   <input type="checkbox" className="peer sr-only" />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
-                              peer-checked:border-purple-600 peer-checked:bg-purple-50
-                              hover:border-purple-200 transition-all duration-300">
+                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-purple-600 peer-checked:bg-purple-50 hover:border-purple-200 transition-all duration-300">
                     <div className="flex items-center gap-3">
                       <span className="font-medium">אחר:</span>
                       <input
                         type="text"
-                        className="flex-1 border-b-2 border-gray-300 focus:border-purple-600
-                                bg-transparent outline-none transition-colors duration-300
-                                text-right"
+                        className="flex-1 border-b-2 border-gray-300 focus:border-purple-600 bg-transparent outline-none transition-colors duration-300 text-right"
                         placeholder="פרט..."
                         onChange={(e) => onDataChange?.({
                           otherPurpose: e.target.value
