@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { savePersonalDetailsToFirebase } from '../../../services/firebase/storage';
-import { User, Briefcase, Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Briefcase } from 'lucide-react';
+import SectionHeader from '../../SectionHeader';
 
 interface PersonalDetailsProps {
   onDataChange?: (data: any) => void;
@@ -27,7 +28,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
       onDataChange(newData);
     }
 
-    // Auto-save when all required fields are filled
     if (isFormComplete(newData)) {
       try {
         await savePersonalDetailsToFirebase(newData);
@@ -46,18 +46,11 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
       <div className="p-8">
-        {/* Section Header */}
-        <div className="flex items-center space-x-4 mb-8">
-          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-            <User className="w-6 h-6 text-blue-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800">פרטים אישיים</h2>
-        </div>
+        <SectionHeader icon={User} title="פרטים אישיים" color="blue" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Full Name */}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -87,7 +80,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             </div>
           </div>
 
-          {/* Contact Info */}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -123,7 +115,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             </div>
           </div>
 
-          {/* Address */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               <div className="flex items-center gap-2">
@@ -140,7 +131,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             />
           </div>
 
-          {/* Birth Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               <div className="flex items-center gap-2">
@@ -157,7 +147,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             />
           </div>
 
-          {/* Occupation */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               <div className="flex items-center gap-2">
@@ -174,7 +163,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             />
           </div>
 
-          {/* Company */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               <div className="flex items-center gap-2">
