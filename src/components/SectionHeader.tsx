@@ -29,7 +29,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon: Icon, title, color 
       <img 
         src="/movne-logo.png"
         alt="מובנה"
-        className="h-8 md:h-12 w-auto object-contain m-4"
+        className="h-20 md:h-32 w-auto object-contain m-4"
       />
     </div>
   );
