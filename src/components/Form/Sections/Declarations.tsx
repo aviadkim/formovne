@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { FileText, Check, AlertCircle } from 'lucide-react';
 import SignaturePad from '../Common/SignaturePad';
+import SectionHeader from '../../SectionHeader';
 
 interface DeclarationsProps {
   onDataChange?: (data: Record<string, unknown>) => void;
@@ -15,23 +16,15 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
   const declarations = [
     {
       title: 'מבוא ופרשנות',
-      content: `הסכם זה נחתם בין חברת מובנה ("החברה") לבין הלקוח. 
-      ההסכם מגדיר את תנאי ההתקשרות בין הצדדים לצורך קבלת שירותי שיווק השקעות.
-      כל המונחים בהסכם זה יפורשו בהתאם להגדרתם בחוק הסדרת העיסוק בייעוץ השקעות, 
-      בשיווק השקעות ובניהול תיקי השקעות, התשנ"ה-1995.`
+      content: `הסכם זה נחתם בין חברת מובנה ("החברה") לבין הלקוח. ההסכם מגדיר את תנאי ההתקשרות בין הצדדים לצורך קבלת שירותי שיווק השקעות.`
     },
     {
       title: 'גילוי נאות',
-      content: `החברה מצהירה כי היא בעלת רישיון לשיווק השקעות מאת רשות ניירות ערך.
-      החברה עוסקת בשיווק השקעות ולא בייעוץ השקעות, ועשויה להעדיף נכסים פיננסיים 
-      שלגופים המוסדיים המנפיקים אותם יש זיקה אליהם. הלקוח מאשר כי הובהר לו שהחברה 
-      משווקת השקעות ולא מייעצת.`
+      content: `החברה מצהירה כי היא בעלת רישיון לשיווק השקעות מאת רשות ניירות ערך. החברה עוסקת בשיווק השקעות ולא בייעוץ השקעות.`
     },
     {
       title: 'הצהרת הלקוח',
-      content: `אני מצהיר כי כל הפרטים שמסרתי בטופס זה הם נכונים, מדויקים ומלאים.
-      אני מתחייב להודיע לחברה על כל שינוי בפרטים אלו. אני מאשר כי קראתי את כל 
-      תנאי ההסכם, הבנתי אותם, ואני מסכים להם.`
+      content: `אני מצהיר כי כל הפרטים שמסרתי בטופס זה הם נכונים, מדויקים ומלאים.`
     }
   ];
 
@@ -45,15 +38,9 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
       <div className="p-8">
-        {/* Section Header */}
-        <div className="flex items-center space-x-4 mb-8">
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-            <FileText className="w-6 h-6 text-purple-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800">הצהרות וחתימה</h2>
-        </div>
+        <SectionHeader icon={FileText} title="הצהרות וחתימה" color="purple" />
 
         <div className="space-y-8">
           {/* Declarations Accordion */}
@@ -100,13 +87,7 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
             
             <div className="prose prose-sm max-w-none text-gray-600 mb-4 leading-relaxed">
               <p>
-                בחתימתי על מסמך זה הריני להצהיר, כל מידע אשר נתבקשתי למסור אולם נמנעתי מלמסרו, 
-                הינו מידע אשר אין ברצוני שישמש את החברה במסגרת מילוי תפקידם על-פי הסכם זה ואני מוותר בזאת על כל טענה 
-                ו/או טרוניה ו/או זכות כלשהי בדבר שיווק השקעות ללא שימוש במידע זה.
-              </p>
-              <p>
-                ידוע לי כי במידה ולא אמסור פרט או פרטים מאלה המצוינים בשאלון זה יקשה על החברה 
-                ליתן לי את השרות המבוקש במסגרת הסכם זה.
+                בחתימתי על מסמך זה הריני להצהיר, כי קראתי והבנתי את כל האמור לעיל.
               </p>
             </div>
 
@@ -118,9 +99,7 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
                   setFinalConfirmation(e.target.checked);
                   onDataChange?.({ finalConfirmation: e.target.checked });
                 }}
-                className="w-5 h-5 border-2 border-purple-300 rounded
-                         checked:bg-purple-600 checked:border-purple-600
-                         focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                className="w-5 h-5 border-2 border-purple-300 rounded checked:bg-purple-600 checked:border-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
               />
               <span className="font-medium text-gray-800">
                 קראתי והבנתי את כל האמור לעיל ואני מאשר את נכונות הפרטים
@@ -134,28 +113,6 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
             signatureRef={signatureRef}
           />
         </div>
-      </div>
-
-      {/* Submit Button */}
-      <div className="fixed bottom-8 left-8 flex flex-col items-end gap-4">
-        <div className="bg-white rounded-2xl shadow-lg p-4 text-center">
-          <div className="text-sm font-medium text-gray-600 mb-1">סטטוס הטופס</div>
-          <div className="text-lg font-bold text-purple-600">
-            {Object.keys(readSections).length}/3 סעיפים נקראו
-          </div>
-        </div>
-        <button
-          type="submit"
-          onClick={handleSubmitClick}
-          disabled={!finalConfirmation || Object.keys(readSections).length < 3}
-          className={`px-8 py-4 rounded-full shadow-lg text-white font-medium
-            ${finalConfirmation && Object.keys(readSections).length === 3 
-              ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' 
-              : 'bg-gray-400'}
-            transition duration-300 ease-in-out transform hover:scale-105`}
-        >
-          שלח טופס
-        </button>
       </div>
     </div>
   );
