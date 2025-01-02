@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Target, Clock, PieChart, TrendingUp } from 'lucide-react';
+import SectionHeader from '../../SectionHeader';
 
 interface RiskAssessmentProps {
   onDataChange?: (data: any) => void;
@@ -12,29 +13,18 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
     investmentPercentage: ''
   });
 
-  // Prevent infinite loop by handling changes directly
   const handleChange = (field: string, value: string) => {
-    const newState = {
-      ...formState,
-      [field]: value
-    };
+    const newState = { ...formState, [field]: value };
     setFormState(newState);
-    // Notify parent component only when data actually changes
     if (onDataChange) {
       onDataChange(newState);
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden" dir="rtl">
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
       <div className="p-8">
-        {/* Section Header */}
-        <div className="flex items-center space-x-4 mb-8">
-          <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-            <Target className="w-6 h-6 text-orange-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800">הערכת סיכונים</h2>
-        </div>
+        <SectionHeader icon={Target} title="הערכת סיכונים" color="orange" />
 
         <div className="space-y-8">
           {/* Main Investment Goal */}
@@ -59,9 +49,7 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
                     checked={formState.mainGoal === goal}
                     onChange={(e) => handleChange('mainGoal', e.target.value)}
                   />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
-                              peer-checked:border-orange-600 peer-checked:bg-orange-50
-                              hover:border-orange-200 transition-all duration-300">
+                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-orange-600 peer-checked:bg-orange-50 hover:border-orange-200 transition-all duration-300">
                     <span className="block text-right font-medium">{goal}</span>
                   </div>
                 </label>
@@ -91,9 +79,7 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
                     checked={formState.investmentPeriod === period}
                     onChange={(e) => handleChange('investmentPeriod', e.target.value)}
                   />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
-                              peer-checked:border-blue-600 peer-checked:bg-blue-50
-                              hover:border-blue-200 transition-all duration-300">
+                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:bg-blue-50 hover:border-blue-200 transition-all duration-300">
                     <span className="block text-right font-medium">{period}</span>
                   </div>
                 </label>
@@ -123,9 +109,7 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({ onDataChange }) => {
                     checked={formState.investmentPercentage === percentage}
                     onChange={(e) => handleChange('investmentPercentage', e.target.value)}
                   />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer
-                              peer-checked:border-green-600 peer-checked:bg-green-50
-                              hover:border-green-200 transition-all duration-300">
+                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-green-600 peer-checked:bg-green-50 hover:border-green-200 transition-all duration-300">
                     <span className="block text-right font-medium">{percentage}</span>
                   </div>
                 </label>
