@@ -1,13 +1,18 @@
-// src/components/PDFTest.tsx
 import React, { useState } from 'react';
-import PersonalDetails from './Form/Sections/PersonalDetails';    
+import { useNavigate } from 'react-router-dom';
+import PersonalDetails from './Form/Sections/PersonalDetails';
 import InvestmentDetails from './Form/Sections/InvestmentDetails';
-import RiskAssessment from './Form/Sections/RiskAssessment';      
+import RiskAssessment from './Form/Sections/RiskAssessment';
 import Declarations from './Form/Sections/Declarations';
 import { FormData } from '../types/form';
 import { generatePDF } from '../services/pdf/generator';
+import { storage, db } from '../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { sendEmail } from '../services/email';
 
 const PDFTest: React.FC = () => {
+  const navigate = useNavigate();
   const [status, setStatus] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
@@ -32,21 +37,33 @@ const PDFTest: React.FC = () => {
     setStatus('מתחיל תהליך שמירה...');
 
     try {
-      // Generate PDF
-      const { pdfBlob } = await generatePDF(formData);
+      // יצירת PDF
+      const { pdfBlob, pdfBase64 } = await generatePDF(formData);
 
-      // Create and trigger download
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = pdfUrl;
-      a.download = `form-${Date.now()}.pdf`;
-      a.click();
+      // העלאה ל-Firebase Storage
+      const storageRef = ref(storage, `forms/${Date.now()}.pdf`);
+      await uploadBytes(storageRef, pdfBlob);
+      const downloadURL = await getDownloadURL(storageRef);
 
-      // Clean up
-      URL.revokeObjectURL(pdfUrl);
+      // שמירה ב-Firestore
+      const docRef = await addDoc(collection(db, 'forms'), {
+        ...formData,
+        pdfUrl: downloadURL,
+        timestamp: serverTimestamp(),
+        email: 'info@movne.co.il'
+      });
 
-      setStatus('הטופס נשמר בהצלחה!');
-      
+      // שליחת מייל
+      await sendEmail(downloadURL, formData);
+
+      // מעבר לדף תודה
+      navigate('/thanks', { 
+        state: { 
+          pdfUrl: downloadURL,
+          formId: docRef.id
+        }
+      });
+
     } catch (error) {
       console.error('Error:', error);
       setStatus('אירעה שגיאה בשמירת הטופס');
@@ -63,8 +80,15 @@ const PDFTest: React.FC = () => {
         <RiskAssessment onDataChange={(data) => handleDataChange('risk', data)} />
         <Declarations 
           onDataChange={(data) => handleDataChange('declarations', data)}
-          onSubmit={handleSubmit}
         />
+
+        <button 
+          type="submit" 
+          disabled={isSubmitting}
+          className="mt-6 w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+        >
+          {isSubmitting ? 'שולח...' : 'שלח טופס'}
+        </button>
 
         {status && (
           <div className="mt-4 p-3 bg-gray-50 rounded-lg border text-center">
