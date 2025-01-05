@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Briefcase, CreditCard, Building2, ArrowUpRight, Target } from 'lucide-react';
 import SectionHeader from '../../SectionHeader';
 
@@ -7,6 +7,53 @@ interface InvestmentDetailsProps {
 }
 
 const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) => {
+  const [amount, setAmount] = useState('');
+  const [formattedAmount, setFormattedAmount] = useState('');
+  const [selectedBank, setSelectedBank] = useState('');
+  const [showCustomBank, setShowCustomBank] = useState(false);
+  const [customBank, setCustomBank] = useState('');
+
+  const banks = [
+    { id: 'leumi', name: 'בנק לאומי' },
+    { id: 'poalim', name: 'בנק הפועלים' },
+    { id: 'discount', name: 'בנק דיסקונט' },
+    { id: 'mizrahi', name: 'בנק מזרחי טפחות' },
+    { id: 'beinleumi', name: 'הבנק הבינלאומי' },
+    { id: 'jerusalem', name: 'בנק ירושלים' },
+    { id: 'ubank', name: 'יו בנק' },
+    { id: 'other', name: 'בנק אחר' }
+  ];
+
+  const formatNumber = (value: string) => {
+    const numericValue = value.replace(/,/g, '');
+    if (numericValue === '') return '';
+    return new Intl.NumberFormat('he-IL').format(Number(numericValue));
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/,/g, '');
+    if (/^\d*$/.test(rawValue)) {
+      setAmount(rawValue);
+      setFormattedAmount(formatNumber(rawValue));
+      onDataChange?.({ amount: rawValue });
+    }
+  };
+
+  const handleBankChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setSelectedBank(value);
+    setShowCustomBank(value === 'other');
+    if (value !== 'other') {
+      onDataChange?.({ bank: value });
+    }
+  };
+
+  const handleCustomBankChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCustomBank(value);
+    onDataChange?.({ bank: value });
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
       <div className="p-8">
@@ -21,11 +68,11 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) =
             </div>
             <div className="relative">
               <input
-                type="number"
-                min="100000"
-                className="w-full p-4 text-right border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                type="text"
+                value={formattedAmount}
+                onChange={handleAmountChange}
+                className="w-full p-4 text-right border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="הכנס סכום (מינימום ₪100,000)"
-                onChange={(e) => onDataChange?.({ investmentAmount: e.target.value })}
               />
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-500">
                 ₪
@@ -42,24 +89,31 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) =
               <Building2 className="w-5 h-5 text-green-600" />
               <h3 className="text-lg font-semibold text-gray-800">בחירת בנק</h3>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {['לאומי', 'הפועלים', 'דיסקונט', 'מזרחי טפחות'].map((bank) => (
-                <label key={bank} className="relative">
-                  <input 
-                    type="radio" 
-                    name="bank" 
-                    className="peer sr-only" 
-                    onChange={() => onDataChange?.({ selectedBank: bank })}
-                  />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-green-600 peer-checked:bg-green-50 hover:border-green-200 transition-all duration-300">
-                    <span className="block text-center font-medium">{bank}</span>
-                  </div>
-                </label>
-              ))}
+            <div className="space-y-4">
+              <select 
+                value={selectedBank}
+                onChange={handleBankChange}
+                className="w-full p-4 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">בחר בנק</option>
+                {banks.map(bank => (
+                  <option key={bank.id} value={bank.id}>{bank.name}</option>
+                ))}
+              </select>
+
+              {showCustomBank && (
+                <input
+                  type="text"
+                  placeholder="הזן שם בנק"
+                  value={customBank}
+                  onChange={handleCustomBankChange}
+                  className="w-full p-4 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500"
+                />
+              )}
             </div>
           </div>
 
-          {/* Reference Currencies */}
+          {/* Reference Currency */}
           <div className="p-6 bg-gradient-to-br from-gray-50 to-yellow-50 rounded-xl">
             <div className="flex items-center gap-3 mb-4">
               <ArrowUpRight className="w-5 h-5 text-yellow-600" />
@@ -81,57 +135,6 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onDataChange }) =
                   </div>
                 </label>
               ))}
-            </div>
-          </div>
-
-          {/* Investment Purpose */}
-          <div className="p-6 bg-gradient-to-br from-gray-50 to-purple-50 rounded-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <Target className="w-5 h-5 text-purple-600" />
-              <h3 className="text-lg font-semibold text-gray-800">ייעוד הכסף</h3>
-              <span className="text-sm text-gray-500">(ניתן לבחור יותר מאחד)</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                'רכישת נכס',
-                'סיוע למשפחה',
-                'פנסיה',
-                'ירושה לילדים',
-                'הכנסה שוטפת מהשקעה',
-                'אין ייעוד לכספים כרגע'
-              ].map((purpose) => (
-                <label key={purpose} className="relative">
-                  <input 
-                    type="checkbox" 
-                    className="peer sr-only"
-                    onChange={(e) => onDataChange?.({
-                      purposes: { [purpose]: e.target.checked }
-                    })}
-                  />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-purple-600 peer-checked:bg-purple-50 hover:border-purple-200 transition-all duration-300 flex items-center gap-3">
-                    <span className="font-medium">{purpose}</span>
-                  </div>
-                </label>
-              ))}
-              {/* Custom Purpose Option */}
-              <div className="md:col-span-2">
-                <label className="relative">
-                  <input type="checkbox" className="peer sr-only" />
-                  <div className="p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-purple-600 peer-checked:bg-purple-50 hover:border-purple-200 transition-all duration-300">
-                    <div className="flex items-center gap-3">
-                      <span className="font-medium">אחר:</span>
-                      <input
-                        type="text"
-                        className="flex-1 border-b-2 border-gray-300 focus:border-purple-600 bg-transparent outline-none transition-colors duration-300 text-right"
-                        placeholder="פרט..."
-                        onChange={(e) => onDataChange?.({
-                          otherPurpose: e.target.value
-                        })}
-                      />
-                    </div>
-                  </div>
-                </label>
-              </div>
             </div>
           </div>
         </div>
