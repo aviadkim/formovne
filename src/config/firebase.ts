@@ -1,16 +1,14 @@
-// src/config/firebase.ts
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  // הקונפיגורציה שלך כאן
-  apiKey: "AIzaSyABz82yg01JJcbNZBzlVWqYEu3LlzFP7PM",
-  authDomain: "forms-7f40e.firebaseapp.com",
-  projectId: "forms-7f40e",
-  storageBucket: "forms-7f40e.appspot.com",
-  messagingSenderId: "256898537105",
-  appId: "1:256898537105:web:2c74f85e2cb2e170c7c84f"
+  apiKey: "AIzaSyDf9QyOVRoRJHhKkrr5bMZCBPlM2uamCQY",
+  authDomain: "client-d5bfe.firebaseapp.com",
+  projectId: "client-d5bfe",
+  storageBucket: "client-d5bfe.appspot.com",
+  messagingSenderId: "662057251211",
+  appId: "1:662057251211:web:8b3d314a4c3c75e7d0fb15"
 };
 
 // Initialize Firebase
