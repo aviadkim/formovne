@@ -1,62 +1,56 @@
-// src/services/firebase/storage.ts
+import { db, storage } from '../../config/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import type { FormData } from '../../types/form';
-
-// Save PDF to Firebase Storage and metadata to Firestore
-export async function savePDFToFirebase(pdfBlob: Blob, formData: FormData): Promise<string> {
+export const saveFormToFirebase = async (formData: any, pdfBlob: Blob) => {
   try {
-    const storage = getStorage();
-    const timestamp = Date.now();
-    const path = `forms/${timestamp}.pdf`;
-    const storageRef = ref(storage, path);
-
     // Upload PDF to Storage
+    const fileName = `forms/${Date.now()}_${formData.personal.lastName}.pdf`;
+    const storageRef = ref(storage, fileName);
     await uploadBytes(storageRef, pdfBlob);
-    const downloadUrl = await getDownloadURL(storageRef);
+    const pdfUrl = await getDownloadURL(storageRef);
 
-    // Save metadata to Firestore
-    const db = getFirestore();
-    await setDoc(doc(db, 'forms', timestamp.toString()), {
-      downloadUrl,
-      timestamp,
-      formData,
-      status: 'completed'
+    // Save form data to Firestore
+    const docRef = await addDoc(collection(db, 'forms'), {
+      ...formData,
+      pdfUrl,
+      createdAt: serverTimestamp()
     });
 
-    return downloadUrl;
+    // Send emails
+    await sendFormEmails(formData.personal.email, 'info@movne.co.il', pdfUrl, formData);
+
+    console.log('Form saved successfully with ID:', docRef.id);
+    return { success: true, docId: docRef.id };
+
   } catch (error) {
-    console.error('Error saving PDF to Firebase:', error);
+    console.error('Error saving form:', error);
     throw error;
   }
-}
+};
 
-export async function savePersonalDetailsToFirebase(data: any): Promise<void> {
+const sendFormEmails = async (userEmail: string, adminEmail: string, pdfUrl: string, formData: any) => {
   try {
-    const db = getFirestore();
-    const timestamp = Date.now().toString();
+    const emailData = {
+      to: [userEmail, adminEmail],
+      subject: 'טופס השקעה חדש - מובנה',
+      html: `
+        <div dir="rtl">
+          <h2>פרטי הטופס:</h2>
+          <p>שם: ${formData.personal.firstName} ${formData.personal.lastName}</p>
+          <p>אימייל: ${formData.personal.email}</p>
+          <p>טלפון: ${formData.personal.phone}</p>
+          <p>סכום השקעה: ${formData.investment?.amount || 'לא צוין'}</p>
+          <p><a href="${pdfUrl}">לחץ כאן לצפייה בטופס המלא</a></p>
+        </div>
+      `
+    };
+
+    // Here you would integrate with your email service
+    // This is a placeholder - you'll need to implement the actual email sending
+    console.log('Would send email with:', emailData);
     
-    await setDoc(doc(db, 'personalDetails', timestamp), {
-      ...data,
-      timestamp: Date.now(),
-      status: 'draft'
-    });
-
-    console.log('Personal details saved successfully');
   } catch (error) {
-    console.error('Error saving personal details:', error);
-    throw error;
+    console.error('Error sending emails:', error);
   }
-}
-
-export async function saveTempImage(imageData: string): Promise<string> {
-  try {
-    const response = await fetch(imageData);
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
-  } catch (error) {
-    console.error('Error saving temp image:', error);
-    throw error;
-  }
-}
+};
