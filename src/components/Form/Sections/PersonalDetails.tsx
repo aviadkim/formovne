@@ -11,12 +11,12 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
     phone: '',
     address: '',
     birthDate: '',
     occupation: '',
-    company: ''
+    company: '',
+    email: ''
   });
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,8 +41,8 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
   const isFormComplete = (data: any) => {
     return data.firstName && 
            data.lastName && 
-           data.email && 
-           data.phone;
+           data.phone &&
+           data.email;
   };
 
   return (
@@ -51,6 +51,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
         <SectionHeader icon={User} title="פרטים אישיים" color="blue" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Hebrew Fields First */}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -84,22 +85,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span>דוא"ל</span>
-                </div>
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4" />
                   <span>טלפון</span>
                 </div>
@@ -113,22 +98,21 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
                 required
               />
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                <span>כתובת</span>
-              </div>
-            </label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>כתובת</span>
+                </div>
+              </label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div>
@@ -176,6 +160,24 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
               value={formData.company}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Email Field Last */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                <span>דוא"ל</span>
+              </div>
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
             />
           </div>
         </div>
