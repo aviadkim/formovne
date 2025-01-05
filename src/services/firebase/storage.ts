@@ -2,37 +2,57 @@ import { db, storage } from '../../config/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-export const saveFormToFirebase = async (formData: any, pdfBlob: Blob) => {
+// פונקציה לשמירת כל הטופס
+export const saveFormToFirebase = async (formData: any) => {
   try {
-    // Upload PDF to Storage
-    const fileName = `forms/${Date.now()}_${formData.personal.lastName}.pdf`;
-    const storageRef = ref(storage, fileName);
-    await uploadBytes(storageRef, pdfBlob);
-    const pdfUrl = await getDownloadURL(storageRef);
-
-    // Save form data to Firestore
+    console.log('Starting form submission to Firebase...', formData);
+    
+    // שמירה ב-Firestore
     const docRef = await addDoc(collection(db, 'forms'), {
       ...formData,
-      pdfUrl,
       createdAt: serverTimestamp()
     });
 
-    // Send emails
-    await sendFormEmails(formData.personal.email, 'info@movne.co.il', pdfUrl, formData);
-
-    console.log('Form saved successfully with ID:', docRef.id);
+    console.log('Form data saved to Firestore with ID:', docRef.id);
     return { success: true, docId: docRef.id };
 
   } catch (error) {
-    console.error('Error saving form:', error);
+    console.error('Error saving form to Firebase:', error);
     throw error;
   }
 };
 
-const sendFormEmails = async (userEmail: string, adminEmail: string, pdfUrl: string, formData: any) => {
+// פונקציה לשמירת ה-PDF
+export const savePDFToFirebase = async (pdfBlob: Blob, lastName: string) => {
   try {
-    const emailData = {
-      to: [userEmail, adminEmail],
+    console.log('Starting PDF upload to Firebase Storage...');
+    
+    const fileName = `forms/${Date.now()}_${lastName}.pdf`;
+    const storageRef = ref(storage, fileName);
+    
+    // העלאת הקובץ
+    await uploadBytes(storageRef, pdfBlob);
+    console.log('PDF uploaded successfully');
+    
+    // קבלת URL להורדה
+    const pdfUrl = await getDownloadURL(storageRef);
+    console.log('PDF URL generated:', pdfUrl);
+    
+    return pdfUrl;
+
+  } catch (error) {
+    console.error('Error uploading PDF:', error);
+    throw error;
+  }
+};
+
+// פונקציה לשליחת מיילים
+export const sendFormEmails = async (formData: any, pdfUrl: string) => {
+  try {
+    console.log('Preparing to send emails...');
+    
+    const emailContent = {
+      to: [formData.personal.email, 'info@movne.co.il'],
       subject: 'טופס השקעה חדש - מובנה',
       html: `
         <div dir="rtl">
@@ -46,11 +66,14 @@ const sendFormEmails = async (userEmail: string, adminEmail: string, pdfUrl: str
       `
     };
 
-    // Here you would integrate with your email service
-    // This is a placeholder - you'll need to implement the actual email sending
-    console.log('Would send email with:', emailData);
+    console.log('Email content prepared:', emailContent);
     
+    // TODO: להוסיף את שירות שליחת המיילים
+    
+    return true;
+
   } catch (error) {
     console.error('Error sending emails:', error);
+    return false;
   }
 };
