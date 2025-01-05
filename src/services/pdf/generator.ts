@@ -7,12 +7,9 @@ export async function generatePDF(formData: FormData) {
     const formElement = document.getElementById('form-container');
     if (!formElement) throw new Error('Form container not found');
 
-    // הוספת סטיילינג לפני הצילום
-    formElement.classList.add('print-mode');
-    
-    // הגדרות צילום משופרות
+    // שיפור איכות הצילום
     const canvas = await html2canvas(formElement, {
-      scale: 2,
+      scale: 2, // הגדלת הרזולוציה
       useCORS: true,
       allowTaint: true,
       logging: false,
@@ -21,9 +18,29 @@ export async function generatePDF(formData: FormData) {
       onclone: (clonedDoc) => {
         const element = clonedDoc.getElementById('form-container');
         if (element) {
-          element.style.padding = '40px';
+          // הגדלת המרווחים
+          element.style.padding = '60px';
           element.style.background = 'white';
-          
+          // וידוא שהטקסט לא נחתך בקצוות
+          const inputs = element.querySelectorAll('input, select, textarea');
+          inputs.forEach(input => {
+            const el = input as HTMLElement;
+            el.style.margin = '10px 0';
+            el.style.minHeight = '40px';
+            el.style.padding = '8px 12px';
+            el.style.width = 'calc(100% - 24px)'; // מניעת גלישה
+            el.style.background = 'white';
+            el.style.border = '1px solid #000';
+          });
+
+          // שיפור נראות תיבות טקסט
+          const textareas = element.querySelectorAll('textarea');
+          textareas.forEach(textarea => {
+            const el = textarea as HTMLElement;
+            el.style.minHeight = '100px';
+            el.style.lineHeight = '1.5';
+          });
+
           // הוספת כותרת עליונה
           const header = document.createElement('div');
           header.innerHTML = `
@@ -36,16 +53,6 @@ export async function generatePDF(formData: FormData) {
             </div>
           `;
           element.insertBefore(header, element.firstChild);
-          
-          // שיפור נראות השדות
-          const inputs = element.querySelectorAll('input, select, textarea');
-          inputs.forEach(input => {
-            const el = input as HTMLElement;
-            el.style.border = '1px solid #000';
-            el.style.padding = '8px';
-            el.style.minHeight = '40px';
-            el.style.background = 'white';
-          });
         }
       }
     });
@@ -59,25 +66,17 @@ export async function generatePDF(formData: FormData) {
       hotfixes: ['px_scaling']
     });
 
-    // חישוב מספר עמודים
+    // חישוב גודל דף אופטימלי
     const pageHeight = pdf.internal.pageSize.getHeight();
     const contentWidth = pdf.internal.pageSize.getWidth();
     const contentHeight = canvas.height * (contentWidth / canvas.width);
     const totalPages = Math.ceil(contentHeight / pageHeight);
 
-    // הוספת כל העמודים
+    // הוספת תוכן בכל עמוד
     for (let i = 0; i < totalPages; i++) {
       if (i > 0) pdf.addPage();
 
-      // הוספת מספר עמוד
-      pdf.setFontSize(10);
-      pdf.text(
-        `עמוד ${i + 1} מתוך ${totalPages}`,
-        pdf.internal.pageSize.getWidth() - 20,
-        pdf.internal.pageSize.getHeight() - 10
-      );
-
-      // הוספת התוכן
+      // הוספת תוכן בדיוק גבוה
       pdf.addImage(
         canvas.toDataURL('image/jpeg', 1.0),
         'JPEG',
@@ -88,10 +87,16 @@ export async function generatePDF(formData: FormData) {
         undefined,
         'FAST'
       );
-    }
 
-    // הסרת סטיילינג זמני
-    formElement.classList.remove('print-mode');
+      // הוספת מספרי עמודים
+      pdf.setFontSize(10);
+      pdf.text(
+        `עמוד ${i + 1} מתוך ${totalPages}`,
+        pdf.internal.pageSize.getWidth() - 40,
+        pdf.internal.pageSize.getHeight() - 20,
+        { align: 'right' }
+      );
+    }
 
     return {
       pdfBlob: pdf.output('blob'),
