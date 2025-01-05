@@ -9,7 +9,7 @@ export async function generatePDF(formData: FormData) {
 
     // שיפור איכות הצילום
     const canvas = await html2canvas(formElement, {
-      scale: 2, // הגדלת הרזולוציה
+      scale: 2,
       useCORS: true,
       allowTaint: true,
       logging: false,
@@ -18,22 +18,20 @@ export async function generatePDF(formData: FormData) {
       onclone: (clonedDoc) => {
         const element = clonedDoc.getElementById('form-container');
         if (element) {
-          // הגדלת המרווחים
           element.style.padding = '60px';
           element.style.background = 'white';
-          // וידוא שהטקסט לא נחתך בקצוות
+          
           const inputs = element.querySelectorAll('input, select, textarea');
           inputs.forEach(input => {
             const el = input as HTMLElement;
             el.style.margin = '10px 0';
             el.style.minHeight = '40px';
             el.style.padding = '8px 12px';
-            el.style.width = 'calc(100% - 24px)'; // מניעת גלישה
+            el.style.width = 'calc(100% - 24px)';
             el.style.background = 'white';
             el.style.border = '1px solid #000';
           });
 
-          // שיפור נראות תיבות טקסט
           const textareas = element.querySelectorAll('textarea');
           textareas.forEach(textarea => {
             const el = textarea as HTMLElement;
@@ -41,7 +39,6 @@ export async function generatePDF(formData: FormData) {
             el.style.lineHeight = '1.5';
           });
 
-          // הוספת כותרת עליונה
           const header = document.createElement('div');
           header.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -66,17 +63,14 @@ export async function generatePDF(formData: FormData) {
       hotfixes: ['px_scaling']
     });
 
-    // חישוב גודל דף אופטימלי
     const pageHeight = pdf.internal.pageSize.getHeight();
     const contentWidth = pdf.internal.pageSize.getWidth();
     const contentHeight = canvas.height * (contentWidth / canvas.width);
     const totalPages = Math.ceil(contentHeight / pageHeight);
 
-    // הוספת תוכן בכל עמוד
     for (let i = 0; i < totalPages; i++) {
       if (i > 0) pdf.addPage();
 
-      // הוספת תוכן בדיוק גבוה
       pdf.addImage(
         canvas.toDataURL('image/jpeg', 1.0),
         'JPEG',
@@ -88,7 +82,6 @@ export async function generatePDF(formData: FormData) {
         'FAST'
       );
 
-      // הוספת מספרי עמודים
       pdf.setFontSize(10);
       pdf.text(
         `עמוד ${i + 1} מתוך ${totalPages}`,
