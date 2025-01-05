@@ -32,10 +32,7 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
     onDataChange?.({ signature: signatureData });
   };
 
-  const handleSubmitClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const formEvent = new Event('submit', { bubbles: true, cancelable: true });
-    e.currentTarget.form?.dispatchEvent(formEvent);
-  };
+  const allSectionsRead = Object.keys(readSections).length === declarations.length;
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -43,6 +40,17 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
         <SectionHeader icon={FileText} title="הצהרות וחתימה" color="purple" />
 
         <div className="space-y-8">
+          {/* Declarations Status */}
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="text-sm font-medium text-gray-600 text-center">
+              <span className="text-lg font-bold text-purple-600">
+                {Object.keys(readSections).length}/{declarations.length}
+              </span>
+              {' '}
+              סעיפים נקראו
+            </div>
+          </div>
+
           {/* Declarations Accordion */}
           <div className="space-y-4">
             {declarations.map((section, index) => (
@@ -95,6 +103,7 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
               <input 
                 type="checkbox"
                 checked={finalConfirmation}
+                disabled={!allSectionsRead}
                 onChange={(e) => {
                   setFinalConfirmation(e.target.checked);
                   onDataChange?.({ finalConfirmation: e.target.checked });
@@ -112,6 +121,31 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) =
             onSave={handleSaveSignature}
             signatureRef={signatureRef}
           />
+        </div>
+
+        {/* Submit Button */}
+        <div className="mt-8 flex justify-center">
+          <button
+            type="submit"
+            onClick={(e) => onSubmit(e as any)}
+            disabled={!finalConfirmation || !allSectionsRead}
+            className={`px-8 py-4 rounded-full font-medium shadow-lg transition duration-300 ease-in-out transform hover:scale-105
+              ${finalConfirmation && allSectionsRead 
+                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+          >
+            שלח טופס
+          </button>
+        </div>
+      </div>
+
+      {/* Status Counter */}
+      <div className="fixed bottom-8 left-8 flex flex-col items-end gap-4">
+        <div className="bg-white rounded-2xl shadow-lg p-4 text-center">
+          <div className="text-sm font-medium text-gray-600 mb-1">סטטוס הטופס</div>
+          <div className="text-lg font-bold text-purple-600">
+            {Object.keys(readSections).length}/3 סעיפים נקראו
+          </div>
         </div>
       </div>
     </div>
