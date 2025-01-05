@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { savePersonalDetailsToFirebase } from '../../../services/firebase/storage';
 import { User, Mail, Phone, MapPin, Calendar, Briefcase } from 'lucide-react';
 import SectionHeader from '../../SectionHeader';
 
@@ -28,21 +27,8 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
       onDataChange(newData);
     }
 
-    if (isFormComplete(newData)) {
-      try {
-        await savePersonalDetailsToFirebase(newData);
-        console.log('Personal details saved automatically');
-      } catch (error) {
-        console.error('Error saving personal details:', error);
-      }
-    }
-  };
-
-  const isFormComplete = (data: any) => {
-    return data.firstName && 
-           data.lastName && 
-           data.phone &&
-           data.email;
+    // Log data change
+    console.log(`Field ${name} updated:`, value);
   };
 
   return (
@@ -51,68 +37,65 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
         <SectionHeader icon={User} title="פרטים אישיים" color="blue" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Hebrew Fields First */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                שם פרטי
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                שם משפחה
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              שם פרטי
+            </label>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  <span>טלפון</span>
-                </div>
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span>כתובת</span>
-                </div>
-              </label>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              שם משפחה
+            </label>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4" />
+                <span>טלפון</span>
+              </div>
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                <span>כתובת</span>
+              </div>
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
 
           <div>
@@ -163,7 +146,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             />
           </div>
 
-          {/* Email Field Last */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               <div className="flex items-center gap-2">
