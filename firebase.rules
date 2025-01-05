@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /forms/{formId} {
+      // מאפשר קריאה רק למובנה
+      allow read: if request.auth != null && 
+                 request.auth.token.email.matches(".*@movne.co.il");
+      // מאפשר כתיבה רק דרך האפליקציה
+      allow write: if request.resource.data.keys().hasAll(['personal', 'investment', 'risk', 'declarations']) &&
+                  request.resource.data.createdAt is timestamp;
+    }
+  }
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /forms/{fileName} {
+      // מאפשר העלאת קבצים רק עם פורמט נכון
+      allow write: if request.resource.contentType.matches('application/pdf') &&
+                  request.resource.size < 5 * 1024 * 1024; // מקסימום 5MB
+      // מאפשר קריאה רק למובנה
+      allow read: if request.auth != null && 
+                 request.auth.token.email.matches(".*@movne.co.il");
+    }
+  }
+}
