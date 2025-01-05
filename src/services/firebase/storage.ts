@@ -54,11 +54,12 @@ export const saveFormToFirebase = async (formData: any): Promise<FormResponse> =
       pdfUrl 
     };
 
-  } catch (error) {
-    console.error('Error saving form:', error);
+  } catch (err) {
+    console.error('Error saving form:', err);
+    const error = err as Error;
     return {
       success: false,
-      error: error.message
+      error: error?.message || 'אירעה שגיאה בשמירת הטופס'
     };
   }
 };
@@ -70,14 +71,14 @@ interface EmailData {
   formData: any;
 }
 
-const sendFormEmails = async (emailData: EmailData) => {
+const sendFormEmails = async (emailData: EmailData): Promise<boolean> => {
   try {
     // כאן יהיה החיבור לשירות המיילים שלך
     // לדוגמה: SendGrid, AWS SES, וכו'
     console.log('Would send email:', emailData);
     return true;
-  } catch (error) {
-    console.error('Error sending emails:', error);
+  } catch (err) {
+    console.error('Error sending emails:', err);
     return false;
   }
 };
