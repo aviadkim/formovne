@@ -1,4 +1,3 @@
-// src/services/pdf/generator.ts
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import type { FormData } from '../../types/form';
@@ -8,10 +7,10 @@ export async function generatePDF(formData: FormData) {
     const formElement = document.getElementById('form-container');
     if (!formElement) throw new Error('Form container not found');
 
-    // הוספת מחלקה זמנית לשיפור סגנון ההדפסה
+    // הוספת סטיילינג לפני הצילום
     formElement.classList.add('print-mode');
-
-    // שיפור איכות הצילום
+    
+    // הגדרות צילום משופרות
     const canvas = await html2canvas(formElement, {
       scale: 2,
       useCORS: true,
@@ -25,7 +24,20 @@ export async function generatePDF(formData: FormData) {
           element.style.padding = '40px';
           element.style.background = 'white';
           
-          // שיפור נראות התיבות
+          // הוספת כותרת עליונה
+          const header = document.createElement('div');
+          header.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <img src="/movne-logo.png" style="height: 50px;" />
+              <div style="text-align: left;">
+                <div>תאריך: ${new Date().toLocaleDateString('he-IL')}</div>
+                <div>שעה: ${new Date().toLocaleTimeString('he-IL')}</div>
+              </div>
+            </div>
+          `;
+          element.insertBefore(header, element.firstChild);
+          
+          // שיפור נראות השדות
           const inputs = element.querySelectorAll('input, select, textarea');
           inputs.forEach(input => {
             const el = input as HTMLElement;
@@ -38,38 +50,47 @@ export async function generatePDF(formData: FormData) {
       }
     });
 
-    // הגדרת גודל A4
+    // יצירת PDF באיכות גבוהה
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'px',
       format: 'a4',
-      compress: true
+      compress: true,
+      hotfixes: ['px_scaling']
     });
 
-    // חישוב יחס דפים
+    // חישוב מספר עמודים
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const contentHeight = canvas.height * (pdf.internal.pageSize.getWidth() / canvas.width);
+    const contentWidth = pdf.internal.pageSize.getWidth();
+    const contentHeight = canvas.height * (contentWidth / canvas.width);
     const totalPages = Math.ceil(contentHeight / pageHeight);
 
-    // הוספת כל הדפים
+    // הוספת כל העמודים
     for (let i = 0; i < totalPages; i++) {
-      if (i > 0) {
-        pdf.addPage();
-      }
+      if (i > 0) pdf.addPage();
 
+      // הוספת מספר עמוד
+      pdf.setFontSize(10);
+      pdf.text(
+        `עמוד ${i + 1} מתוך ${totalPages}`,
+        pdf.internal.pageSize.getWidth() - 20,
+        pdf.internal.pageSize.getHeight() - 10
+      );
+
+      // הוספת התוכן
       pdf.addImage(
         canvas.toDataURL('image/jpeg', 1.0),
         'JPEG',
         0,
         -(pageHeight * i),
-        pdf.internal.pageSize.getWidth(),
+        contentWidth,
         contentHeight,
         undefined,
         'FAST'
       );
     }
 
-    // הסרת המחלקה הזמנית
+    // הסרת סטיילינג זמני
     formElement.classList.remove('print-mode');
 
     return {
