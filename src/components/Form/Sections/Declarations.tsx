@@ -5,82 +5,77 @@ interface DeclarationsProps {
 }
 
 const Declarations: React.FC<DeclarationsProps> = ({ onDataChange }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const isCheckbox = type === 'checkbox';
+    const finalValue = isCheckbox ? (e.target as HTMLInputElement).checked : value;
+    
     onDataChange({
-      [name]: value
+      [name]: finalValue
     });
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold">הצהרות משקיע</h2>
-      
-      {/* מספר שנות ניסיון */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">מספר שנות נסיון</label>
-        <input
-          type="number"
-          name="experienceYears"
+      <h2 className="text-xl font-bold text-center">הצהרות וחתימה</h2>
+
+      {/* מידע אודות החברה */}
+      <div className="bg-blue-50 rounded-lg p-4">
+        <h3 className="text-lg font-medium mb-3">מידע אודות החברה</h3>
+        <textarea
+          name="companyInfo"
+          rows={3}
+          className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          placeholder="כאן יופיע מידע אודות החברה..."
           onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         />
       </div>
 
-      {/* סכום רכישה */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">סכום רכישה</label>
-        <input
-          type="number"
-          name="purchaseAmount"
-          onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        />
-      </div>
-
-      {/* חתימה דיגיטלית */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">חתימה דיגיטלית</label>
-        <div className="mt-1 p-4 border-2 border-dashed border-gray-300 rounded-lg">
-          <div className="text-center">
-            {/* כאן נוסיף את קומפוננטת החתימה */}
-            <p className="text-sm text-gray-500">לחץ כאן לחתימה</p>
+      {/* הצהרת סיכון */}
+      <div className="bg-red-50 rounded-lg p-4">
+        <h3 className="text-lg font-medium mb-3">הצהרת סיכון</h3>
+        <div className="space-y-2">
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="riskAcknowledgement"
+              name="riskAcknowledgement"
+              className="mt-1 mr-2"
+              onChange={handleChange}
+            />
+            <label htmlFor="riskAcknowledgement" className="text-sm">
+              אני מצהיר/ה כי קראתי והבנתי את כל הסיכונים הכרוכים בהשקעה
+            </label>
           </div>
         </div>
       </div>
 
-      {/* אישורים */}
-      <div className="space-y-4">
-        <div className="flex items-start">
-          <div className="flex items-center h-5">
+      {/* תנאי שימוש */}
+      <div className="bg-green-50 rounded-lg p-4">
+        <h3 className="text-lg font-medium mb-3">תנאי שימוש</h3>
+        <div className="space-y-2">
+          <div className="flex items-start">
             <input
               type="checkbox"
-              name="isInfoConfirmed"
+              id="termsAcceptance"
+              name="termsAcceptance"
+              className="mt-1 mr-2"
               onChange={handleChange}
-              className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
             />
-          </div>
-          <div className="mr-3 text-sm">
-            <label className="font-medium text-gray-700">
-              אני מאשר שכל המידע שמסרתי נכון ומדויק
+            <label htmlFor="termsAcceptance" className="text-sm">
+              אני מסכים/ה לתנאי השימוש
             </label>
           </div>
         </div>
+      </div>
 
-        <div className="flex items-start">
-          <div className="flex items-center h-5">
-            <input
-              type="checkbox"
-              name="isTermsAccepted"
-              onChange={handleChange}
-              className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
-            />
-          </div>
-          <div className="mr-3 text-sm">
-            <label className="font-medium text-gray-700">
-              אני מאשר את תנאי השימוש ומדיניות הפרטיות
-            </label>
-          </div>
+      {/* אזור חתימה */}
+      <div className="bg-purple-50 rounded-lg p-4">
+        <h3 className="text-lg font-medium mb-3">חתימה דיגיטלית</h3>
+        <div 
+          className="border-2 border-dashed border-purple-200 rounded-lg h-32 flex items-center justify-center"
+        >
+          אזור החתימה
         </div>
       </div>
     </div>
