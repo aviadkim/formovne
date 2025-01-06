@@ -56,9 +56,16 @@ export const saveFormToFirebase = async (formData: any): Promise<FormResponse> =
 
   } catch (error) {
     console.error('Error saving form:', error);
+    // תיקון הטיפול בשגיאה
+    if (error instanceof Error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
     return {
       success: false,
-      error: error.message
+      error: 'אירעה שגיאה לא צפויה'
     };
   }
 };
