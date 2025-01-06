@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 
 interface DeclarationsProps {
   onDataChange: (data: Record<string, unknown>) => void;
+  onSubmit?: () => void; // עשינו אותו אופציונלי
 }
 
-const Declarations: React.FC<DeclarationsProps> = ({ onDataChange }) => {
+const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) => {
   const [openSection, setOpenSection] = useState<number | null>(null);
 
   const handleSectionClick = (index: number) => {
@@ -24,20 +25,7 @@ const Declarations: React.FC<DeclarationsProps> = ({ onDataChange }) => {
       content: (
         <div className="p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-gray-600 mb-4">
-            מידע כללי על החברה ופעילותה בשוק ההון.
-          </p>
-        </div>
-      )
-    },
-    {
-      title: 'פרטי השקעה',
-      content: (
-        <div className="p-4 bg-green-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-4">
-            סכום השקעה מינימלי: ₪50,000
-          </p>
-          <p className="text-sm text-gray-600">
-            תקופת השקעה מומלצת: 3-5 שנים
+            מידע כללי על החברה ופעילותה בשוק ההון
           </p>
         </div>
       )
