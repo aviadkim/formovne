@@ -1,82 +1,109 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface DeclarationsProps {
   onDataChange: (data: Record<string, unknown>) => void;
 }
 
 const Declarations: React.FC<DeclarationsProps> = ({ onDataChange }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    const isCheckbox = type === 'checkbox';
-    const finalValue = isCheckbox ? (e.target as HTMLInputElement).checked : value;
-    
+  const [openSection, setOpenSection] = useState<number | null>(null);
+
+  const handleSectionClick = (index: number) => {
+    setOpenSection(openSection === index ? null : index);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
     onDataChange({
-      [name]: finalValue
+      [name]: checked
     });
   };
 
-  return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-center">הצהרות וחתימה</h2>
-
-      {/* מידע אודות החברה */}
-      <div className="bg-blue-50 rounded-lg p-4">
-        <h3 className="text-lg font-medium mb-3">מידע אודות החברה</h3>
-        <textarea
-          name="companyInfo"
-          rows={3}
-          className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-          placeholder="כאן יופיע מידע אודות החברה..."
-          onChange={handleChange}
-        />
-      </div>
-
-      {/* הצהרת סיכון */}
-      <div className="bg-red-50 rounded-lg p-4">
-        <h3 className="text-lg font-medium mb-3">הצהרת סיכון</h3>
-        <div className="space-y-2">
-          <div className="flex items-start">
+  const sections = [
+    {
+      title: 'מידע אודות החברה',
+      content: (
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-gray-600 mb-4">
+            מידע כללי על החברה ופעילותה בשוק ההון.
+          </p>
+        </div>
+      )
+    },
+    {
+      title: 'פרטי השקעה',
+      content: (
+        <div className="p-4 bg-green-50 rounded-lg">
+          <p className="text-sm text-gray-600 mb-4">
+            סכום השקעה מינימלי: ₪50,000
+          </p>
+          <p className="text-sm text-gray-600">
+            תקופת השקעה מומלצת: 3-5 שנים
+          </p>
+        </div>
+      )
+    },
+    {
+      title: 'הצהרת סיכון',
+      content: (
+        <div className="p-4 bg-yellow-50 rounded-lg">
+          <div className="flex items-start space-x-2 rtl:space-x-reverse">
             <input
               type="checkbox"
               id="riskAcknowledgement"
               name="riskAcknowledgement"
-              className="mt-1 mr-2"
               onChange={handleChange}
+              className="mt-1"
             />
-            <label htmlFor="riskAcknowledgement" className="text-sm">
-              אני מצהיר/ה כי קראתי והבנתי את כל הסיכונים הכרוכים בהשקעה
+            <label htmlFor="riskAcknowledgement" className="text-sm text-gray-700">
+              אני מאשר/ת כי קראתי והבנתי את כל הסיכונים הכרוכים בהשקעה
             </label>
           </div>
         </div>
-      </div>
-
-      {/* תנאי שימוש */}
-      <div className="bg-green-50 rounded-lg p-4">
-        <h3 className="text-lg font-medium mb-3">תנאי שימוש</h3>
-        <div className="space-y-2">
-          <div className="flex items-start">
+      )
+    },
+    {
+      title: 'תנאי שימוש',
+      content: (
+        <div className="p-4 bg-purple-50 rounded-lg">
+          <div className="flex items-start space-x-2 rtl:space-x-reverse">
             <input
               type="checkbox"
               id="termsAcceptance"
               name="termsAcceptance"
-              className="mt-1 mr-2"
               onChange={handleChange}
+              className="mt-1"
             />
-            <label htmlFor="termsAcceptance" className="text-sm">
-              אני מסכים/ה לתנאי השימוש
+            <label htmlFor="termsAcceptance" className="text-sm text-gray-700">
+              אני מסכים/ה לתנאי השימוש והמדיניות
             </label>
           </div>
         </div>
-      </div>
+      )
+    }
+  ];
 
-      {/* אזור חתימה */}
-      <div className="bg-purple-50 rounded-lg p-4">
-        <h3 className="text-lg font-medium mb-3">חתימה דיגיטלית</h3>
-        <div 
-          className="border-2 border-dashed border-purple-200 rounded-lg h-32 flex items-center justify-center"
-        >
-          אזור החתימה
-        </div>
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold">הצהרות</h2>
+      <div className="space-y-2">
+        {sections.map((section, index) => (
+          <div key={index} className="border rounded-lg overflow-hidden">
+            <button
+              className="w-full px-4 py-3 text-right bg-gray-50 hover:bg-gray-100 focus:outline-none flex justify-between items-center"
+              onClick={() => handleSectionClick(index)}
+            >
+              <span className="font-medium">{section.title}</span>
+              <span className="text-blue-500">
+                {openSection === index ? '−' : '+'}
+              </span>
+            </button>
+            {openSection === index && (
+              <div className="border-t">
+                {section.content}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
