@@ -3,11 +3,17 @@ import PersonalDetails from './Form/Sections/PersonalDetails';
 import InvestmentDetails from './Form/Sections/InvestmentDetails';
 import RiskAssessment from './Form/Sections/RiskAssessment';
 import Declarations from './Form/Sections/Declarations';
-import { FormData } from '../types/form';
+import type { FormData } from '../types/form';
 import { generatePDF } from '../services/pdf/generator';
 
+interface Props {
+  data?: FormData;
+  onDataChange?: (data: any) => void;
+}
+
 const PDFTest: React.FC = () => {
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [status, setStatus] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     personal: {
       firstName: '',
@@ -36,7 +42,7 @@ const PDFTest: React.FC = () => {
     }
   });
 
-  const handleDataChange = (section: keyof FormData, data: Record<string, unknown>) => {
+  const handleDataChange = (section: keyof FormData, data: any) => {
     setFormData(prev => ({
       ...prev,
       [section]: {
@@ -46,17 +52,15 @@ const PDFTest: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return;
-
+    setIsSubmitting(true);
+    
     try {
-      setIsSubmitting(true);
-      const result = await generatePDF(formData);
-      console.log('PDF generated successfully:', result);
+      const pdfData = await generatePDF(formData);
       
-      // הורדת הקובץ
-      const blob = new Blob([result.pdfBlob], { type: 'application/pdf' });
+      // Download PDF
+      const blob = new Blob([pdfData.pdfBlob], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -65,8 +69,11 @@ const PDFTest: React.FC = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
+      
+      setStatus('PDF generated successfully');
     } catch (error) {
       console.error('Error generating PDF:', error);
+      setStatus('Error generating PDF');
     } finally {
       setIsSubmitting(false);
     }
@@ -75,17 +82,21 @@ const PDFTest: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <form id="form-container" onSubmit={handleSubmit} className="space-y-6">
-        <PersonalDetails
-          onDataChange={(data) => handleDataChange('personal', data)}
+        <PersonalDetails 
+          data={formData.personal}
+          onDataChange={data => handleDataChange('personal', data)} 
         />
-        <InvestmentDetails
-          onDataChange={(data) => handleDataChange('investment', data)}
+        <InvestmentDetails 
+          data={formData.investment}
+          onDataChange={data => handleDataChange('investment', data)} 
         />
-        <RiskAssessment
-          onDataChange={(data) => handleDataChange('risk', data)}
+        <RiskAssessment 
+          data={formData.risk}
+          onDataChange={data => handleDataChange('risk', data)} 
         />
         <Declarations
-          onDataChange={(data) => handleDataChange('declarations', data)}
+          data={formData.declarations}
+          onDataChange={data => handleDataChange('declarations', data)}
         />
 
         <div className="mt-6 text-right">
@@ -96,6 +107,11 @@ const PDFTest: React.FC = () => {
           >
             {isSubmitting ? 'מייצר PDF...' : 'צור PDF'}
           </button>
+          {status && (
+            <div className={status.includes('error') ? 'text-red-500' : 'text-green-500'}>
+              {status}
+            </div>
+          )}
         </div>
       </form>
     </div>
