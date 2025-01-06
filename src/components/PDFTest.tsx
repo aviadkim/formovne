@@ -6,11 +6,6 @@ import Declarations from './Form/Sections/Declarations';
 import type { FormData } from '../types/form';
 import { generatePDF } from '../services/pdf/generator';
 
-interface Props {
-  data?: FormData;
-  onDataChange?: (data: any) => void;
-}
-
 const PDFTest: React.FC = () => {
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,7 +37,7 @@ const PDFTest: React.FC = () => {
     }
   });
 
-  const handleDataChange = (section: keyof FormData, data: any) => {
+  const handleDataChange = (section: keyof FormData, data: Record<string, unknown>) => {
     setFormData(prev => ({
       ...prev,
       [section]: {
