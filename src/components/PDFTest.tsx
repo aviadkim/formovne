@@ -3,7 +3,7 @@ import PersonalDetails from './Form/Sections/PersonalDetails';
 import InvestmentDetails from './Form/Sections/InvestmentDetails';
 import RiskAssessment from './Form/Sections/RiskAssessment';
 import Declarations from './Form/Sections/Declarations';
-import type { FormData } from '../types/form';
+import type { FormData, PersonalData, InvestmentData, RiskData, DeclarationsData } from '../types/form';
 import { generatePDF } from '../services/pdf/generator';
 
 const PDFTest: React.FC = () => {
@@ -37,7 +37,10 @@ const PDFTest: React.FC = () => {
     }
   });
 
-  const handleDataChange = (section: keyof FormData, data: Record<string, unknown>) => {
+  const handleDataChange = (
+    section: keyof FormData, 
+    data: Partial<PersonalData | InvestmentData | RiskData | DeclarationsData>
+  ) => {
     setFormData(prev => ({
       ...prev,
       [section]: {
