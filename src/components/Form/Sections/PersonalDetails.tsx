@@ -1,34 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { User, Mail, Phone, MapPin, Calendar, Briefcase } from 'lucide-react';
 import SectionHeader from '../../SectionHeader';
+import type { PersonalData } from '../../../types/form';
 
 interface PersonalDetailsProps {
-  onDataChange?: (data: any) => void;
+  data: PersonalData;
+  onDataChange: (data: Partial<PersonalData>) => void;
 }
 
-const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    address: '',
-    birthDate: '',
-    occupation: '',
-    company: '',
-    email: ''
-  });
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+const PersonalDetails: React.FC<PersonalDetailsProps> = ({ data, onDataChange }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const newData = { ...formData, [name]: value };
-    setFormData(newData);
-    
-    if (onDataChange) {
-      onDataChange(newData);
-    }
-
-    // Log data change
-    console.log(`Field ${name} updated:`, value);
+    onDataChange({ [name]: value });
   };
 
   return (
@@ -44,7 +27,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <input
               type="text"
               name="firstName"
-              value={formData.firstName}
+              value={data.firstName}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
@@ -58,7 +41,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <input
               type="text"
               name="lastName"
-              value={formData.lastName}
+              value={data.lastName}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
@@ -75,7 +58,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <input
               type="tel"
               name="phone"
-              value={formData.phone}
+              value={data.phone}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
@@ -92,7 +75,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <input
               type="text"
               name="address"
-              value={formData.address}
+              value={data.address}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -108,7 +91,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <input
               type="date"
               name="birthDate"
-              value={formData.birthDate}
+              value={data.birthDate}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -124,7 +107,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <input
               type="text"
               name="occupation"
-              value={formData.occupation}
+              value={data.occupation}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -140,7 +123,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <input
               type="text"
               name="company"
-              value={formData.company}
+              value={data.company}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -156,7 +139,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onDataChange }) => {
             <input
               type="email"
               name="email"
-              value={formData.email}
+              value={data.email}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
