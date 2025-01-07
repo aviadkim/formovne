@@ -10,53 +10,50 @@ export async function generatePDF(formData: FormData) {
       compress: true,
     });
 
-    // Load Hebrew font (Make sure you have the font file in your public folder)
-    pdf.addFont('public/fonts/Arial.ttf', 'Arial', 'normal');
-    pdf.setFont('Arial');
-
-    // Page dimensions
+    // מידות העמוד
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 40;
     const effectiveWidth = pageWidth - (2 * margin);
 
-    // Helper function to measure text width
+    // פונקציית עזר למדידת רוחב טקסט
     const getTextWidth = (text: string, fontSize: number): number => {
       pdf.setFontSize(fontSize);
       return pdf.getStringUnitWidth(text) * fontSize;
     };
 
-    // Helper function to draw a field with label
+    // פונקציית עזר לציור שדה עם תווית
     const drawField = (label: string, value: string | undefined, y: number, isRight = true) => {
       const safeValue = value || '';
       const x = isRight ? pageWidth - margin : margin + effectiveWidth / 2;
-      const width = (effectiveWidth / 2) - 20;
-      const fieldPadding = 10;
+      const width = (effectiveWidth / 2) - 10;  // הגדלת רוחב התיבה
+      const fieldPadding = 15;  // הגדלת המרווח הפנימי
+      const boxHeight = 45;  // הגדלת גובה התיבה
 
-      // Label
+      // תווית
       pdf.setFontSize(11);
       pdf.setTextColor(80, 80, 80);
       const labelY = y;
       pdf.text(label, x, labelY);
 
-      // Input box with more padding
+      // תיבת הקלט עם מרווח גדול יותר
       pdf.setDrawColor(200, 200, 200);
       pdf.setFillColor(255, 255, 255);
       const boxY = labelY + 5;
-      pdf.roundedRect(x - width, boxY, width, 35, 3, 3, 'FD'); // Increased height to 35
+      pdf.roundedRect(x - width, boxY, width, boxHeight, 3, 3, 'FD');
 
-      // Value text with overflow handling
+      // טקסט הערך עם טיפול בגלישה
       pdf.setFontSize(12);
       pdf.setTextColor(0, 0, 0);
-      const textY = boxY + 23; // Centered vertically in the larger box
+      const textY = boxY + 28;  // ממורכז אנכית בתיבה הגדולה יותר
       
-      // Handle text overflow
-      const maxWidth = width - (2 * fieldPadding);
+      // טיפול בטקסט ארוך
+      const maxWidth = width - (3 * fieldPadding);  // יותר מקום לטקסט
       let displayText = safeValue;
       let textWidth = getTextWidth(displayText, 12);
       
       if (textWidth > maxWidth) {
-        // Truncate text and add ellipsis
+        // קיצור הטקסט והוספת נקודות
         while (textWidth > maxWidth && displayText.length > 0) {
           displayText = displayText.slice(0, -1);
           textWidth = getTextWidth(displayText + '...', 12);
@@ -66,65 +63,64 @@ export async function generatePDF(formData: FormData) {
 
       pdf.text(displayText, x - width + fieldPadding, textY, { align: 'right' });
 
-      return textY + 25; // Return next Y position with more spacing
+      return textY + 35;  // החזרת מיקום Y הבא עם מרווח גדול יותר
     };
 
-    // Header and timestamp
+    // כותרת וזמן
     const headerY = margin;
     const now = new Date();
 
-    // Logo
+    // לוגו
     try {
       await pdf.addImage('/movne-logo.png', 'PNG', pageWidth - margin - 60, headerY, 50, 50);
     } catch (error) {
       console.warn('Could not load logo:', error);
     }
     
-    // Date and time info
+    // מידע על התאריך והשעה
     pdf.setFontSize(10);
     pdf.text(`תאריך: ${now.toLocaleDateString('he-IL')}`, margin, headerY + 15);
     pdf.text(`שעה: ${now.toLocaleTimeString('he-IL')}`, margin, headerY + 30);
 
-    // Personal Details Section
+    // פרטים אישיים
     let currentY = headerY + 80;
     pdf.setFontSize(16);
     pdf.setTextColor(0, 0, 0);
     pdf.text('פרטים אישיים', pageWidth - margin, currentY);
-    currentY += 40; // Increased spacing after section title
+    currentY += 40;  // מרווח מוגדל אחרי כותרת הסעיף
 
-    // Draw personal information fields with more spacing
     const drawPersonalFields = () => {
-      // First row - Last name and First name
+      // שורה ראשונה - שם משפחה ושם פרטי
       currentY = drawField('שם משפחה', formData.personal?.lastName, currentY, true);
       currentY = drawField('שם פרטי', formData.personal?.firstName, currentY - 50, false);
-      currentY += 25;
+      currentY += 35;  // מרווח מוגדל בין השורות
 
-      // Second row - Address and Phone
+      // שורה שנייה - כתובת וטלפון
       currentY = drawField('כתובת', formData.personal?.address, currentY, true);
       currentY = drawField('טלפון', formData.personal?.phone, currentY - 50, false);
-      currentY += 25;
+      currentY += 35;
 
-      // Third row - Occupation and Birth Date
+      // שורה שלישית - תעסוקה ותאריך לידה
       currentY = drawField('תעסוקה', formData.personal?.occupation, currentY, true);
       currentY = drawField('תאריך לידה', formData.personal?.birthDate, currentY - 50, false);
-      currentY += 25;
+      currentY += 35;
 
-      // Fourth row - Email and Company
+      // שורה רביעית - דוא"ל וחברה
       currentY = drawField('דוא"ל', formData.personal?.email, currentY, true);
       currentY = drawField('חברה', formData.personal?.company, currentY - 50, false);
-      currentY += 45; // Extra spacing before next section
+      currentY += 45;  // מרווח נוסף לפני הסעיף הבא
     };
 
     drawPersonalFields();
 
-    // Investment Questionnaire Section
+    // שאלון השקעות
     pdf.setFontSize(16);
     pdf.text('שאלון השקעות', pageWidth - margin, currentY);
     currentY += 30;
 
-    // Investment Amount
+    // סכום השקעה
     pdf.setFillColor(240, 247, 250);
-    pdf.rect(margin, currentY - 5, effectiveWidth, 70, 'F'); // Increased height
+    pdf.rect(margin, currentY - 5, effectiveWidth, 70, 'F');  // הגדלת הגובה
     
     pdf.setFontSize(12);
     pdf.text('סכום מתוכנן להשקעה:', pageWidth - margin - 10, currentY + 25);
@@ -135,7 +131,7 @@ export async function generatePDF(formData: FormData) {
       currentY + 25
     );
 
-    // Page numbers
+    // מספרי עמודים
     pdf.setFontSize(10);
     pdf.text(
       '1/1',
