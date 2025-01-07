@@ -1,21 +1,21 @@
 import { PersonalData, InvestmentData, RiskData, DeclarationsData } from './form';
 
 export interface PersonalDetailsProps {
-  data: Partial<PersonalData>;
+  data: PersonalData;
   onDataChange: (data: Partial<PersonalData>) => void;
 }
 
 export interface InvestmentDetailsProps {
-  data: Partial<InvestmentData>;
-  onDataChange: (data: Partial<InvestmentData>) => void;
+  data: InvestmentData;
+  onDataChange: (data: any) => void;
 }
 
 export interface RiskAssessmentProps {
-  data: Partial<RiskData>;
-  onDataChange: (data: Partial<RiskData>) => void;
+  data: RiskData;
+  onDataChange: (data: any) => void;
 }
 
 export interface DeclarationsProps {
-  data: Partial<DeclarationsData>;
-  onDataChange: (data: Partial<DeclarationsData>) => void;
+  data: DeclarationsData;
+  onDataChange: (data: Record<string, unknown>) => void;
 }
