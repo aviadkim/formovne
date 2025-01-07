@@ -14,7 +14,6 @@ export interface InvestmentData {
   selectedBank: string;
   currencies: Record<string, boolean>;
   purposes: Record<string, boolean>;
-  otherPurpose?: string;
 }
 
 export interface RiskData {
