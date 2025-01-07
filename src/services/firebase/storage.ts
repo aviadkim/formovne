@@ -53,7 +53,7 @@ export const saveFormToFirebase = async (formData: any): Promise<FormResponse> =
       docId: docRef.id,
       pdfUrl 
     };
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('Error saving form:', error);
     return {
       success: false,
