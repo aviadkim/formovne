@@ -1,99 +1,121 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { DeclarationsProps } from '../../../types/props';
+import { SectionHeader } from '../Common/SectionHeader';
+import SignatureCanvas from 'react-signature-canvas';
 
-interface DeclarationsProps {
-  onDataChange: (data: Record<string, unknown>) => void;
-  onSubmit?: () => void; // עשינו אותו אופציונלי
-}
+const Declarations: React.FC<DeclarationsProps> = ({ data, onDataChange }) => {
+  const signaturePadRef = useRef<SignatureCanvas>(null);
+  const [showSignature, setShowSignature] = useState(false);
 
-const Declarations: React.FC<DeclarationsProps> = ({ onDataChange, onSubmit }) => {
-  const [openSection, setOpenSection] = useState<number | null>(null);
-
-  const handleSectionClick = (index: number) => {
-    setOpenSection(openSection === index ? null : index);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+  const handleReadSection = (sectionNumber: number, isChecked: boolean) => {
     onDataChange({
-      [name]: checked
+      readSections: {
+        ...data.readSections,
+        [sectionNumber]: isChecked
+      }
     });
   };
 
-  const sections = [
-    {
-      title: 'מידע אודות החברה',
-      content: (
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-4">
-            מידע כללי על החברה ופעילותה בשוק ההון
-          </p>
-        </div>
-      )
-    },
-    {
-      title: 'הצהרת סיכון',
-      content: (
-        <div className="p-4 bg-yellow-50 rounded-lg">
-          <div className="flex items-start space-x-2 rtl:space-x-reverse">
-            <input
-              type="checkbox"
-              id="riskAcknowledgement"
-              name="riskAcknowledgement"
-              onChange={handleChange}
-              className="mt-1"
-            />
-            <label htmlFor="riskAcknowledgement" className="text-sm text-gray-700">
-              אני מאשר/ת כי קראתי והבנתי את כל הסיכונים הכרוכים בהשקעה
-            </label>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: 'תנאי שימוש',
-      content: (
-        <div className="p-4 bg-purple-50 rounded-lg">
-          <div className="flex items-start space-x-2 rtl:space-x-reverse">
-            <input
-              type="checkbox"
-              id="termsAcceptance"
-              name="termsAcceptance"
-              onChange={handleChange}
-              className="mt-1"
-            />
-            <label htmlFor="termsAcceptance" className="text-sm text-gray-700">
-              אני מסכים/ה לתנאי השימוש והמדיניות
-            </label>
-          </div>
-        </div>
-      )
+  const handleSignatureEnd = () => {
+    if (signaturePadRef.current) {
+      const signatureData = signaturePadRef.current.toDataURL();
+      onDataChange({ signature: signatureData });
     }
-  ];
+  };
+
+  const clearSignature = () => {
+    if (signaturePadRef.current) {
+      signaturePadRef.current.clear();
+      onDataChange({ signature: undefined });
+    }
+  };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold">הצהרות</h2>
-      <div className="space-y-2">
-        {sections.map((section, index) => (
-          <div key={index} className="border rounded-lg overflow-hidden">
-            <button
-              className="w-full px-4 py-3 text-right bg-gray-50 hover:bg-gray-100 focus:outline-none flex justify-between items-center"
-              onClick={() => handleSectionClick(index)}
-            >
-              <span className="font-medium">{section.title}</span>
-              <span className="text-blue-500">
-                {openSection === index ? '−' : '+'}
-              </span>
-            </button>
-            {openSection === index && (
-              <div className="border-t">
-                {section.content}
-              </div>
-            )}
+    <section className="space-y-6">
+      <SectionHeader 
+        title="הצהרות והתחייבויות" 
+        subtitle="אנא קרא בעיון את ההצהרות הבאות וסמן את הסכמתך"
+      />
+
+      <div className="space-y-4">
+        {/* Section 1 */}
+        <div className="p-4 border rounded-lg">
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              checked={data.readSections?.[1] || false}
+              onChange={(e) => handleReadSection(1, e.target.checked)}
+              className="mt-1"
+            />
+            <div className="mr-3">
+              <h4 className="font-semibold">הצהרת מדיניות השקעה</h4>
+              <p className="text-sm text-gray-600">
+                קראתי והבנתי את מדיניות ההשקעה של החברה ואני מסכים לתנאיה
+              </p>
+            </div>
           </div>
-        ))}
+        </div>
+
+        {/* Section 2 */}
+        <div className="p-4 border rounded-lg">
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              checked={data.readSections?.[2] || false}
+              onChange={(e) => handleReadSection(2, e.target.checked)}
+              className="mt-1"
+            />
+            <div className="mr-3">
+              <h4 className="font-semibold">הצהרת סיכונים</h4>
+              <p className="text-sm text-gray-600">
+                אני מודע לסיכונים הכרוכים בהשקעה ומקבל אותם על עצמי
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3 */}
+        <div className="p-4 border rounded-lg">
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              checked={data.readSections?.[3] || false}
+              onChange={(e) => handleReadSection(3, e.target.checked)}
+              className="mt-1"
+            />
+            <div className="mr-3">
+              <h4 className="font-semibold">אישור פרטים</h4>
+              <p className="text-sm text-gray-600">
+                אני מאשר שכל הפרטים שמסרתי נכונים ומדויקים
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Digital Signature */}
+        <div className="mt-6">
+          <h4 className="font-semibold mb-2">חתימה דיגיטלית</h4>
+          <div className="border rounded-lg p-4">
+            <div className="bg-gray-50 border rounded h-40">
+              <SignatureCanvas
+                ref={signaturePadRef}
+                onEnd={handleSignatureEnd}
+                canvasProps={{
+                  className: 'signature-canvas w-full h-full'
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={clearSignature}
+              className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+            >
+              נקה חתימה
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
