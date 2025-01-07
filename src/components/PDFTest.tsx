@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import PersonalDetails from './Form/Sections/PersonalDetails';
+import PersonalDetails from './Form/Sections/PersonalDetails';    
 import InvestmentDetails from './Form/Sections/InvestmentDetails';
-import RiskAssessment from './Form/Sections/RiskAssessment';
+import RiskAssessment from './Form/Sections/RiskAssessment';      
 import Declarations from './Form/Sections/Declarations';
 import type { FormData, PersonalData, InvestmentData, RiskData, DeclarationsData } from '../types/form';
 import { generatePDF } from '../services/pdf/generator';
 
 const PDFTest: React.FC = () => {
-  const [status, setStatus] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
     personal: {
       firstName: '',
@@ -50,28 +50,32 @@ const PDFTest: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     setIsSubmitting(true);
-    
+    setStatus('מתחיל תהליך שמירה...');
+
     try {
-      const pdfData = await generatePDF(formData);
+      // Generate PDF
+      const { pdfBlob } = await generatePDF(formData);
+
+      // Create and trigger download
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = pdfUrl;
+      a.download = `form-${Date.now()}.pdf`;
+      a.click();
+
+      // Clean up
+      URL.revokeObjectURL(pdfUrl);
+
+      setStatus('הטופס נשמר בהצלחה!');
       
-      // Download PDF
-      const blob = new Blob([pdfData.pdfBlob], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'form.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      
-      setStatus('PDF generated successfully');
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      setStatus('Error generating PDF');
+      console.error('Error:', error);
+      setStatus('אירעה שגיאה בשמירת הטופס');
     } finally {
       setIsSubmitting(false);
     }
@@ -82,35 +86,26 @@ const PDFTest: React.FC = () => {
       <form id="form-container" onSubmit={handleSubmit} className="space-y-6">
         <PersonalDetails 
           data={formData.personal}
-          onDataChange={data => handleDataChange('personal', data)} 
+          onDataChange={(data) => handleDataChange('personal', data)} 
         />
         <InvestmentDetails 
           data={formData.investment}
-          onDataChange={data => handleDataChange('investment', data)} 
+          onDataChange={(data) => handleDataChange('investment', data)} 
         />
         <RiskAssessment 
           data={formData.risk}
-          onDataChange={data => handleDataChange('risk', data)} 
+          onDataChange={(data) => handleDataChange('risk', data)} 
         />
-        <Declarations
+        <Declarations 
           data={formData.declarations}
-          onDataChange={data => handleDataChange('declarations', data)}
+          onDataChange={(data) => handleDataChange('declarations', data)}
         />
 
-        <div className="mt-6 text-right">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-          >
-            {isSubmitting ? 'שולח טופס...' : 'שלח טופס'}
-          </button>
-          {status && (
-            <div className={status.includes('error') ? 'text-red-500' : 'text-green-500'}>
-              {status}
-            </div>
-          )}
-        </div>
+        {status && (
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg border text-center">
+            {status}
+          </div>
+        )}
       </form>
     </div>
   );
