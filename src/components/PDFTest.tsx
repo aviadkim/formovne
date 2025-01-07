@@ -38,7 +38,7 @@ const PDFTest: React.FC = () => {
   });
 
   const handleDataChange = (
-    section: keyof FormData, 
+    section: keyof FormData,
     data: Partial<PersonalData | InvestmentData | RiskData | DeclarationsData>
   ) => {
     setFormData(prev => ({
@@ -101,9 +101,9 @@ const PDFTest: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
           >
-            {isSubmitting ? 'מייצר PDF...' : 'צור PDF'}
+            {isSubmitting ? 'שולח טופס...' : 'שלח טופס'}
           </button>
           {status && (
             <div className={status.includes('error') ? 'text-red-500' : 'text-green-500'}>
