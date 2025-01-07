@@ -19,3 +19,16 @@ export interface DeclarationsProps {
   data: Partial<DeclarationsData>;
   onDataChange: (data: Partial<DeclarationsData>) => void;
 }
+
+export interface PrintableFieldProps {
+  label: string;
+  value?: string | number;
+  onChange: (value: string) => void;
+  type?: string;
+  required?: boolean;
+}
+
+export interface SectionHeaderProps {
+  title: string;
+  subtitle?: string;
+}
