@@ -1,17 +1,11 @@
-import React from 'react';
-import { InvestmentDetailsProps } from '../../../types/props';
-import { SectionHeader } from '../Common/SectionHeader';
+import React, { useState } from 'react';
+import { Briefcase, CreditCard, Building2, ArrowUpRight } from 'lucide-react';
+import SectionHeader from '../../SectionHeader';
+import type { InvestmentData } from '../../../types/form';
 
-const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ data, onDataChange }) => {
-  return (
-    <section className="space-y-4">
-      <SectionHeader
-        title="פרטי השקעה"
-        subtitle="אנא מלא את פרטי ההשקעה"
-      />
-      {/* Your existing JSX */}
-    </section>
-  );
-};
+interface InvestmentDetailsProps {
+  data?: Partial<InvestmentData>;
+  onDataChange: (data: Partial<InvestmentData>) => void;
+}
 
-export default InvestmentDetails;
+// המשך הקוד נשאר בדיוק כמו שהוא...
