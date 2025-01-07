@@ -4,7 +4,7 @@ import { SectionHeader } from '../Common/SectionHeader';
 import { PrintableField } from '../Common/PrintableField';
 
 const PersonalDetails: React.FC<PersonalDetailsProps> = ({ data, onDataChange }) => {
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string): void => {
     onDataChange({ [field]: value });
   };
 
@@ -19,45 +19,45 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ data, onDataChange })
         <PrintableField
           label="שם משפחה"
           value={data.lastName}
-          onChange={(value) => handleChange('lastName', value)}
+          onChange={(value: string) => handleChange('lastName', value)}
         />
         <PrintableField
           label="שם פרטי"
           value={data.firstName}
-          onChange={(value) => handleChange('firstName', value)}
+          onChange={(value: string) => handleChange('firstName', value)}
         />
         <PrintableField
           label="דוא״ל"
           value={data.email}
-          onChange={(value) => handleChange('email', value)}
+          onChange={(value: string) => handleChange('email', value)}
           type="email"
         />
         <PrintableField
           label="טלפון"
           value={data.phone}
-          onChange={(value) => handleChange('phone', value)}
+          onChange={(value: string) => handleChange('phone', value)}
           type="tel"
         />
         <PrintableField
           label="כתובת"
           value={data.address}
-          onChange={(value) => handleChange('address', value)}
+          onChange={(value: string) => handleChange('address', value)}
         />
         <PrintableField
           label="תאריך לידה"
           value={data.birthDate}
-          onChange={(value) => handleChange('birthDate', value)}
+          onChange={(value: string) => handleChange('birthDate', value)}
           type="date"
         />
         <PrintableField
           label="תעסוקה"
           value={data.occupation}
-          onChange={(value) => handleChange('occupation', value)}
+          onChange={(value: string) => handleChange('occupation', value)}
         />
         <PrintableField
           label="חברה"
           value={data.company}
-          onChange={(value) => handleChange('company', value)}
+          onChange={(value: string) => handleChange('company', value)}
         />
       </div>
     </section>
