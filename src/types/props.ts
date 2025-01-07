@@ -17,18 +17,5 @@ export interface RiskAssessmentProps {
 
 export interface DeclarationsProps {
   data: Partial<DeclarationsData>;
-  onDataChange: (data: Record<string, unknown>) => void;
-}
-
-export interface PrintableFieldProps {
-  label: string;
-  value?: string | number;
-  onChange: (value: string) => void;
-  type?: string;
-  required?: boolean;
-}
-
-export interface SectionHeaderProps {
-  title: string;
-  subtitle?: string;
+  onDataChange: (data: Partial<DeclarationsData>) => void;
 }
